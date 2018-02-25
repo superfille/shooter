@@ -1,0 +1,19 @@
+{
+  "name": "shooter",
+  "version": "0.0.1",
+  "description": "Shooter multiplayer game",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/superfille/shooter.git"
+  },
+  "author": "Filip Anic",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/superfille/shooter/issues"
+  },
+  "homepage": "https://github.com/superfille/shooter#readme"
+}
