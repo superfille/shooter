@@ -1,0 +1,23 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>My Page</title>
+    <script src="phaser.min.js"></script>
+
+    <script type="text/javascript">
+        let game = {}
+    </script>
+
+    <script src="game/globals.js"></script>
+    <script src="game/preload.js"></script>
+    <script src="game/create.js"></script>
+    <script src="game/update.js"></script>
+
+    <script type="text/javascript">
+        game = new Phaser.Game(960, 960, Phaser.AUTO, '', { preload: preload, create: create, update: update, render: render });
+    </script>
+</head>
+<body>
+</body>
+</html>
