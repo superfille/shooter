@@ -47,9 +47,13 @@ function Player(game, name, playerSprite, bulletSprite, coinSprite, x, y, hudx, 
 	}
 
 	this.shoot = function() {
-		if(this.coins.children.length === coinsToShoot) {
+		//if(this.coins.children.length === coinsToShoot) {
+		if(true) {
 			this.coins.removeAll()
 			this.weapon.fire()
+			if(this.weaponSound) {
+				this.weaponSound.play()
+			}
 		}
 	}
 
@@ -74,12 +78,17 @@ function Player(game, name, playerSprite, bulletSprite, coinSprite, x, y, hudx, 
 	}
 
 	this.overlapEnemyBullet = function(game, enemyBullets) {
-		game.physics.arcade.overlap(this.player, enemyBullets, this.die, null, this)
+		game.physics.arcade.overlap(this.player, enemyBullets, function() {
+			this.die(game)
+		}, null, this)
 	}
 
-	this.die = function() {
-		console.log(this.name + " died")
-		//TODO: Add pixel explosion
+	this.die = function(game) {
+		if(this.dieSound) {
+			this.dieSound.play()
+		}
+		this.player.kill()
+		this.dieEffect(game)
 	}
 
 	this.overlapAmmunition = function(game, ammunition) {
@@ -90,6 +99,50 @@ function Player(game, name, playerSprite, bulletSprite, coinSprite, x, y, hudx, 
 		ammunition.kill()
 		if(this.coins.children.length < 3) {
 			this.addCoin()
+			if(this.ammunitionSound) {
+				this.ammunitionSound.play()
+			}
 		}
+	}
+
+	this.addWeaponSound = function(game, sound) {
+		this.weaponSound = game.add.audio(sound)
+	}
+
+	this.addAmmunitionSound = function(game, sound) {
+		this.ammunitionSound = game.add.audio(sound)
+	}
+
+	this.addDieSound = function(game, sound) {
+		this.dieSound = game.add.audio(sound)
+	}
+
+	this.destroyEmitter = function() {
+		this.deadEmitter.destroy()
+	}
+
+	this.explosionParticle = function(game, x, y, key, frame) {  
+		Phaser.Particle.call(this, game, x, y, key, frame);
+	}
+	
+	this.explosionParticle.prototype = Object.create(Phaser.Particle.prototype)  
+	this.explosionParticle.prototype.constructor = this.explosionParticle; 
+	this.explosionParticle.prototype.onEmit = function() {  
+		this.animations.add('explosion', Phaser.Animation.generateFrameNames("explosion_",  1, 11, ".png", 2))
+		this.animations.play('explosion', 20, false, true)
+	}
+
+	this.dieEffect = function(game) {  
+		emitter = game.add.emitter(this.player.x, this.player.y, 6)
+		emitter.particleClass = this.explosionParticle
+		emitter.makeParticles('explosion')
+		emitter.width = 20
+		emitter.height = 20
+		emitter.minParticleScale = 0.5
+		emitter.maxParticleScale = 3
+		emitter.minParticleSpeed.set(0, 0)
+		emitter.maxParticleSpeed.set(0, 0)
+		emitter.gravity = 0
+		emitter.start(false, 2000, 50, 6)      
 	}
 }

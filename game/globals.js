@@ -11,3 +11,5 @@ const reloadAmmoTime = 6000
 
 let map
 let groundLayer
+
+let music
