@@ -6,33 +6,60 @@ function createMap() {
 	groundLayer.resizeWorld()
 }
 
-function createPlayer() {
+function createPlayer1() {
+	player1Weapon = game.add.weapon(30, 'player1bullet')
+
+	player1Weapon.bulletKillType = Phaser.Weapon.KILL_NEVER
+	player1Weapon.bulletCollideWorldBounds = true
+	player1Weapon.bulletGravity = 100
+	player1Weapon.bulletSpeed = 600
+	player1Weapon.bullets.setAll('body.bounce.x', 1);
+	player1Weapon.bullets.setAll('body.bounce.y', 1);
+	player1Weapon.fireRate = 100
+
 	player1 = game.add.sprite(100, 100, 'player1')
+
+	player1.anchor.set(0.5)
+
 	game.physics.arcade.enable(player1)
 	player1.body.collideWorldBounds = true
-	
-	
-	player1Bullet = game.add.group()
-	player1Bullet.enableBody = true
-	player1Bullet.physicsBodyType = Phaser.Physics.ARCADE
-	player1Bullet.createMultiple(30, 'player1bullet')
-	player1Bullet.setAll('collideWorldBounds', true)
-	player1Bullet.setAll('bounce', 1)
 
-	// player1Bullet = game.add.weapon(30, 'player1bullet')
-	// player1Bullet.trackSprite(player1, 14, 0)
-	// player1Bullet.bulletSpeed = 300
-	// player1Bullet.bulletKillType = Phaser.Weapon.NEVER_KILL
+	player1.body.drag.set(50)
+    player1.body.maxVelocity.set(200)
+	
+	player1Weapon.trackSprite(player1, 0, 0, true)
+
+	cursors = game.input.keyboard.createCursorKeys()
+
 	player1FireButton = game.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR)
+}
 
+function createPlayer2() {
+	player2Weapon = game.add.weapon(30, 'player2bullet')
 
-	player2 = game.add.sprite(600, 100, 'player2')
-	player2Bullet = game.add.weapon(1, 'player2bullet')
+	player2Weapon.bulletKillType = Phaser.Weapon.KILL_NEVER
+	player2Weapon.bulletCollideWorldBounds = true
+	player2Weapon.bulletGravity = 100
+	player2Weapon.bulletSpeed = 600
+	player2Weapon.bullets.setAll('body.bounce.x', 1);
+	player2Weapon.bullets.setAll('body.bounce.y', 1);
+	player2Weapon.fireRate = 100
+
+	player2 = game.add.sprite(100, 100, 'player2')
+
+	player2.anchor.set(0.5)
+
 	game.physics.arcade.enable(player2)
 	player2.body.collideWorldBounds = true
-	player2Bullet.trackSprite(player2, 14, 0)
-	player2FireButton = game.input.keyboard.addKey(Phaser.KeyCode.ALT)
+
+	player2.body.drag.set(50)
+    player2.body.maxVelocity.set(200)
 	
+	player2Weapon.trackSprite(player2, 0, 0, true)
+
+	cursors = game.input.keyboard.createCursorKeys()
+
+	player2FireButton = game.input.keyboard.addKey(Phaser.KeyCode.ALT)
 }
 
 function createBullet(player, bullet, button, keycode, img) {
@@ -47,6 +74,7 @@ function create (){
 	cursors = game.input.keyboard.createCursorKeys()
 
 	createMap()
-	createPlayer()
+	createPlayer1()
+	createPlayer2()
 }
 

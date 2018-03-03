@@ -1,9 +1,9 @@
 let player1 = {}
-let player1Bullet = {}
+let player1Weapon = {}
 let player1FireButton = {}
 
 let player2 = {}
-let player2Bullet = {}
+let player2Weapon = {}
 let player2FireButton = {}
 
 let map
