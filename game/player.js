@@ -1,13 +1,14 @@
 const maxBullets = 50
 const bulletSpeed = 500
-const forwardVelocity = 500
+const forwardVelocity = 400
 const angularVelocity = 300
 const coinsToShoot = 3
 
-function Player(game, name, playerSprite, bulletSprite, coinSprite, x, y, hudx, hudy, controlls) {
+function Player(game, name, playerSprite, bulletSprite, coinSprite, x, y, angle, hudx, hudy, controlls) {
 	this.hud = {x: hudx, y: hudy}
 	this.coinSprite = coinSprite
 	this.name = name
+	this.isDead = false
 
 	this.weapon = game.add.weapon(maxBullets, bulletSprite)
 
@@ -19,6 +20,7 @@ function Player(game, name, playerSprite, bulletSprite, coinSprite, x, y, hudx, 
 
 	this.player = game.add.sprite(x, y, playerSprite)
 	this.player.anchor.set(0.5)
+	this.player.angle = angle
 
 	game.physics.arcade.enable(this.player)
 	this.player.body.collideWorldBounds = true
@@ -47,8 +49,8 @@ function Player(game, name, playerSprite, bulletSprite, coinSprite, x, y, hudx, 
 	}
 
 	this.shoot = function() {
-		//if(this.coins.children.length === coinsToShoot) {
-		if(true) {
+		if(this.coins.children.length === coinsToShoot) {
+		//if(true) {
 			this.coins.removeAll()
 			this.weapon.fire()
 			if(this.weaponSound) {
@@ -58,6 +60,7 @@ function Player(game, name, playerSprite, bulletSprite, coinSprite, x, y, hudx, 
 	}
 
 	this.update = function(game) {
+		if(this.isDead) return
 		this.player.body.velocity.x = 0
 		this.player.body.velocity.y = 0
 		this.player.body.angularVelocity = 0
@@ -89,6 +92,7 @@ function Player(game, name, playerSprite, bulletSprite, coinSprite, x, y, hudx, 
 		}
 		this.player.kill()
 		this.dieEffect(game)
+		this.isDead = true
 	}
 
 	this.overlapAmmunition = function(game, ammunition) {

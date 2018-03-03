@@ -1,13 +1,18 @@
 function createMap() {
 	map = game.add.tilemap('tilemap');
-	map.addTilesetImage('dirt', 'dirt')
+	map.addTilesetImage('tile_atlas', 'tile_atlas')
 
-	groundLayer = map.createLayer('Ground')
+	groundLayer = map.createLayer('Tile Layer 1')
 	groundLayer.resizeWorld()
 }
 
 function createPlayer1() {
-	player1 = new Player(game, 'Filip', 'ship', 'green_ball', 'coin', 100, 100, 32, 32, 
+	player1 = new Player(
+		game, 'Player1', 'car_yellow', 'yellow_ball', 'coin',
+		getRandomInt(50, width),
+		getRandomInt(50, height),
+		getRandomInt(0, 360),
+		32, 32,
 		{
 			forward: Phaser.KeyCode.W,
 			left:    Phaser.KeyCode.A,
@@ -20,7 +25,12 @@ function createPlayer1() {
 }
 
 function createPlayer2() {
-	player2 = new Player(game, 'Kamilla', 'ufo', 'yellow_ball', 'coin', 600, 100, 800, 32, 
+	player2 = new Player(
+		game, 'Player2', 'car_blue', 'blue_ball', 'coin',
+		getRandomInt(50, width),
+		getRandomInt(50, height),
+		getRandomInt(0, 360),
+		width - 130, 32, 
 		{
 			forward: Phaser.KeyCode.UP,
 			left:    Phaser.KeyCode.LEFT,
@@ -37,7 +47,8 @@ function initAmmo() {
 }
 
 function createAmmo() {
-	ammunition.create(getRandomInt(0, 850), getRandomInt(100, 850), 'ammo')
+	ammunition.create(getRandomInt(0, width), getRandomInt(100, height), 'ammo')
+	ammunitionSpawn.play()
 }
 
 function getRandomInt(min, max) {
@@ -65,6 +76,7 @@ function initMusic() {
 
 function create() {
 	initMusic()
+	ammunitionSpawn = game.add.audio('pop')
 	game.physics.startSystem(Phaser.Physics.ARCADE)
 	cursors = game.input.keyboard.createCursorKeys()
 
