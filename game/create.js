@@ -32,6 +32,14 @@ function createPlayer1() {
 	cursors = game.input.keyboard.createCursorKeys()
 
 	player1FireButton = game.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR)
+
+	player1Text =
+		game.add.text(28, 28, 'Player 1',
+			{
+				font: '22px Arial',
+				fill: '#000000',
+				align: 'center'
+			})
 }
 
 function createPlayer2() {
@@ -60,21 +68,69 @@ function createPlayer2() {
 	cursors = game.input.keyboard.createCursorKeys()
 
 	player2FireButton = game.input.keyboard.addKey(Phaser.KeyCode.ALT)
+
+	player2Text =
+		game.add.text(900, 28, 'Player 2',
+			{
+				font: '22px Arial',
+				fill: '#000000',
+				align: 'center'
+			})
 }
 
-function createBullet(player, bullet, button, keycode, img) {
-	bullet = game.add.weapon(30, img)
-	bullet.trackSprite(player, 14, 0)
-	bullet.bulletSpeed = 300
-	button = game.input.keyboard.addKey(keycode)
+function initAmmo() {
+	ammunition = game.add.physicsGroup()
 }
 
-function create (){
+function createAmmo() {
+	ammunition.create(getRandomInt(0, 900), getRandomInt(0, 900), 'ammo')
+}
+
+function getRandomInt(min, max) {
+	min = Math.ceil(min);
+	max = Math.floor(max);
+	return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
+}
+
+function initCoins() {
+	player1Coins = game.add.group()
+	player2Coins = game.add.group()
+}
+
+function createCoin(player) {
+	if(player === 1) {
+		player1Coins.children.length
+		let c = game.add.sprite(32 * player1Coins.children.length, 60, 'coin')
+		c.animations.add('walk')
+		c.animations.play('walk', 12, true)
+		player1Coins.add(c)
+	}else {
+		let c = game.add.sprite(820 + (32 * player2Coins.children.length), 60, 'coin')
+		c.animations.add('walk')
+		c.animations.play('walk', 12, true)
+		player2Coins.add(c)
+	}
+}
+
+function winText() {
+	text = game.add.text(game.world.centerX, game.world.centerY, '',
+		{
+			font: '65px Arial',
+			fill: '#FF5722',
+			align: 'center'
+		})
+	text.anchor.setTo(0.5, 0.5)
+}
+
+function create() {
 	game.physics.startSystem(Phaser.Physics.ARCADE)
 	cursors = game.input.keyboard.createCursorKeys()
 
 	createMap()
 	createPlayer1()
 	createPlayer2()
+	winText()
+	initAmmo()
+	initCoins()
 }
 

@@ -1,6 +1,34 @@
 function update() {
 	updatePlayer1()
 	updatePlayer2()
+	ammunitionUpdate()
+}
+
+function ammunitionUpdate() {
+	if(addAmmo) {
+		createAmmo()
+		setTimeout(function() {
+			addAmmo = true
+		}, reloadAmmoTime)
+		addAmmo = false
+	}
+
+	game.physics.arcade.overlap(player1, ammunition, player1AddAmmo, null)
+	game.physics.arcade.overlap(player2, ammunition, player2AddAmmo, null)
+}
+
+function player1AddAmmo(p1, ammo) {
+	ammo.kill()
+	if(player1Coins.children.length < 3) {
+		createCoin(1)
+	}
+}
+
+function player2AddAmmo(p2, ammo) {
+	ammo.kill()
+	if(player2Coins.children.length < 3) {
+		createCoin(2)
+	}
 }
 
 function updatePlayer1() {
@@ -24,7 +52,10 @@ function updatePlayer1() {
     }
 
     if (player1FireButton.isDown){
-        player1Weapon.fire()
+		if(player1Coins.children.length === 3) {
+			player1Coins.removeAll()
+			player1Weapon.fire()
+		}
     }
 
 	game.physics.arcade.overlap(player1, player2Weapon.bullets, player1Dead, null)
@@ -32,7 +63,7 @@ function updatePlayer1() {
 }
 
 function player1Dead() {
-	alert("Dead")
+	text.text = "Player 2 wins"
 }
 
 function updatePlayer2() {
@@ -56,7 +87,10 @@ function updatePlayer2() {
     }
 
     if (player2FireButton.isDown) {
-        player2Weapon.fire()
+		if(player2Coins.children.length === 3) {
+			player2Coins.removeAll()
+			player2Weapon.fire()
+		}
 	}
 
 	game.physics.arcade.overlap(player2, player1Weapon.bullets, player1Dead, null)
@@ -65,5 +99,5 @@ function updatePlayer2() {
 
 
 function render() {
-	
+
 }
