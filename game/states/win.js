@@ -1,6 +1,6 @@
 const winState = {
 	create() {
-		const winLabel = game.add.text(
+		const winLabel = Game.game.add.text(
 			80, 80,
 			'You Won',
 			{
@@ -8,7 +8,7 @@ const winState = {
 				fill: '#0f0'
 			}
 		)
-		const startLabel = game.add.text(
+		const startLabel = Game.game.add.text(
 			80, game.world.height - 80,
 			'Press the "W" key to restart',
 			{
@@ -17,12 +17,12 @@ const winState = {
 			}
 		)
 
-		const wKey = game.input.keyboard.addKey(Phaser.Keyboard.W)
+		const wKey = Game.game.input.keyboard.addKey(Phaser.Keyboard.W)
 
 		wKey.onDown.addOnce(this.restart, this)
 	},
 
 	restart() {
-		game.state.start('menu')
+		Game.game.state.start('menu')
 	}
 }

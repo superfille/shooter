@@ -1,10 +1,11 @@
 {
   "name": "shooter",
-  "version": "0.0.2",
+  "version": "0.0.5",
   "description": "Shooter multiplayer game",
   "main": "server.js",
   "dependencies": {
-    "express": "^4.16.2"
+    "express": "^4.16.2",
+    "socket.io": "^2.0.4"
   },
   "repository": {
     "type": "git",

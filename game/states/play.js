@@ -1,127 +1,64 @@
 const playState = {
 	create() {
 		this.initMusic()
-		ammunitionSpawn = game.add.audio('pop')
-		game.physics.startSystem(Phaser.Physics.ARCADE)
-		cursors = game.input.keyboard.createCursorKeys()
+		Game.game.physics.startSystem(Phaser.Physics.ARCADE)
 	
 		this.createMap()
-		this.createPlayer1()
-		this.createPlayer2()
-		this.initAmmo()
+		Client.askNewPlayer()
 	},
 
 	update() {
-		if(!player1.isAlive()) {
-			this.win()
-		}else if(!player2.isAlive()) {
-			this.win()
-		}
+		// if(clientPlayer === undefined) return
+		// if(!clientPlayer.isAlive()) {
+		// 	this.win()
+		// }
+		// else if(!remotePlayer.isAlive()) {
+		// 	this.win()
+		// }
 
-		this.ammunitionUpdate()
-		player1.update()
-		player2.update()
+		//this.ammunitionUpdate()
+		Game.players.forEach((player) => {
+			player.update()
+			//player.isHit(remotePlayer.weapon.bullets)
+		})
+		//clientPlayer.update()
+		//remotePlayer.update()
 	
-		player1.isHit(player2.weapon.bullets)
-		player2.isHit(player1.weapon.bullets)
+		//clientPlayer.isHit(remotePlayer.weapon.bullets)
+		//remotePlayer.isHit(player1.weapon.bullets)
+
+		//clientPlayer.collideLayer(collisonLayer)
+		//remotePlayer.collideLayer(collisonLayer)
 	},
 
 	win() {
-		game.state.start('win')
+		Game.startState('win')
 	},
 
 	ammunitionUpdate() {
-		if(addAmmo) {
-			this.createAmmo()
-			setTimeout(function() {
-				addAmmo = true
-			}, reloadAmmoTime)
-			addAmmo = false
-		}
-	
-		player1.overlapAmmunition(ammunition)
-		player2.overlapAmmunition(ammunition)
+		Ammunition.overlap(clientPlayer, clientPlayer.addAmmunition)
+		//Ammunition.overlap(remotePlayer, remotePlayer.addAmmunition)
 	},
 
 	createMap() {
-		map = game.add.tilemap('tilemap');
-		map.addTilesetImage('tile_atlas', 'tile_atlas')
+		Game.map = Game.game.add.tilemap('tilemap');
+		Game.map.addTilesetImage('tmw_desert_spacing', 'tile_atlas')
 	
-		groundLayer = map.createLayer('Tile Layer 1')
-		groundLayer.resizeWorld()
-	},
-	
-	createPlayer1() {
-		player1 = new Player(
-			'Filip',
-			'car_yellow',
-			this.getRandomInt(50, width),
-			this.getRandomInt(50, height),
-			this.getRandomInt(0, 360)
-		)
-		player1.addControlls(
-			{
-				forward: Phaser.KeyCode.W,
-				left:    Phaser.KeyCode.A,
-				right:   Phaser.KeyCode.D,
-				fire:    Phaser.KeyCode.SPACEBAR	
-			}
-		)
-		player1.addWeapon('yellow_ball')
-		player1.addHud(32, 32)
-		player1.addWeaponSound('blaster')
-		player1.addAmmunitionSound('pickup')
-		player1.addDieSound('explosion')
-		player1.addHeart()
-		player1.addHeart()
-		player1.addHeart()
-	},
-	
-	createPlayer2() {
-		player2 = new Player(
-			'Player2',
-			'car_blue',
-			this.getRandomInt(50, width),
-			this.getRandomInt(50, height),
-			this.getRandomInt(0, 360)
-		)
-		player2.addControlls(
-			{
-				forward: Phaser.KeyCode.UP,
-				left:    Phaser.KeyCode.LEFT,
-				right:   Phaser.KeyCode.RIGHT,
-				fire:    Phaser.KeyCode.CONTROL		
-			}
-		)
-		player2.addWeapon('blue_ball')
-		player2.addHud(width - 130, 32)
-		player2.addWeaponSound('shotgun')
-		player2.addAmmunitionSound('pickup')
-		player2.addDieSound('explosion')
-		player2.addHeart()
-		player2.addHeart()
-		player2.addHeart()
-	},
-	
-	initAmmo() {
-		ammunition = game.add.physicsGroup()
-	},
-	
-	createAmmo() {
-		ammunition.create(this.getRandomInt(0, width), this.getRandomInt(100, height), 'ammo')
-		ammunitionSpawn.play()
-	},
-	
-	getRandomInt(min, max) {
-		min = Math.ceil(min)
-		max = Math.floor(max)
-		return Math.floor(Math.random() * (max - min)) + min
+		// groundLayer = map.createLayer('Tile Layer 1')
+		// groundLayer.resizeWorld()
+		Game.groundLayer = Game.map.createLayer('Ground')
+		Game.collisonLayer = Game.map.createLayer('Object')
+		Game.groundLayer.resizeWorld()
+
+		Game.map.setCollisionBetween(0, 1000, true, Game.collisonLayer)
 	},
 	
 	initMusic() {
-		music = game.add.audio('boden')
-		music.play()
-		music.loop = true
-		music.volume = 0.7
+		if(Game.musicOn) {
+			Game.music = Game.game.add.audio('boden')
+			Game.music.play()
+			Game.music.loop = true
+			Game.music.volume = 0.7
+		}
 	}
 }
