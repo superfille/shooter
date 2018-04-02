@@ -1,5 +1,3 @@
-const Game = {}
-
 Game.initialize = function(width, height) {
 	this.players = []
 	this.ammunition = {}
@@ -34,51 +32,28 @@ Game.startState = function(state) {
 	this.game.state.start(state)
 }
 
-
 Game.removePlayer = function (id) {
-
+	const player = this.players.find((player) => player.id === id)
+	delete player
 }
 
-Game.addClientPlayer = function(id, name, x, y) {
-	const player = this.createPlayer(id, name, x, y)
-	const controlls = new Controlls(
-		{
-			forward: Phaser.KeyCode.W,
-			left:    Phaser.KeyCode.A,
-			right:   Phaser.KeyCode.D,
-			fire:    Phaser.KeyCode.SPACEBAR	
-		}
-	)
-	
-	player.addMovement(controlls)
+Game.addRemotePlayerMove = function(data) {
+	const player = this.players.find((player) => player.id === data.id)
+	if (player) {
+		player.setState(data.state)
+	}
+}
+
+Game.createClientPlayer = function(data) {
+	this.clientPlayer = new ClientPlayer(data)
+
+	this.players.push(this.clientPlayer)
+}
+
+Game.addRemotePlayer = function(data) {
+	console.log("Remote player ", data)
+	const player = new RemotePlayer(data)
 	this.players.push(player)
-	console.log("Adding client player")
-}
-
-Game.addNewPlayer = function(id, name, x, y) {
-	this.players.push(this.createPlayer(id, name, x, y))
-}
-
-Game.createPlayer = function(id, name, x, y) {
-	let car
-	let ball
-	if(id === 1) {
-		car = 'car_yellow'
-		ball = 'yellow_ball'
-	} else {
-		car = 'car_blue'
-		ball = 'blue_ball'
-	}
-	
-	const player = new Player(name, car, x, y, Utils.getRandomInt(0, 360), ball)
-	
-	if(id === 1) {
-		player.addHud(32, 32)
-	} else {
-		player.addHud(this.width - 130, 32)
-	}
-	
-	return player
 }
 
 Game.addAudio = function (audio) {

@@ -17,25 +17,60 @@ console.log(sitePath);
 console.log("Starting server in: " + __dirname + '/' + sitePath);
 app.use(express.static(__dirname + '/' + sitePath));
 
-server.listen(8081, function() {
+server.listen(8081, '0.0.0.0', function() {
 	console.log("Listening on " + server.address().port)
 })
 
-server.lastPlayerID = 0
+server.firstPlayer = { used: false, number: 1 }
+server.secondPlayer = { used: false, number: 2 }
 
 io.on('connection', function(socket) {
 	socket.on('newplayer', function() {
-		socket.player = {
-			id: server.lastPlayerID++,
-			x: randomInt(100, 400),
-			y: randomInt(100,400)
+		let id
+		if (!server.firstPlayer.used) {
+			id = server.firstPlayer.number
+			server.firstPlayer.used = true
+		} else if (!server.secondPlayer.used) {
+			id = server.secondPlayer.number
+			server.secondPlayer.used = true
+		} else {
+			socket.emit('maxPlayers')
+			return
 		}
+
+		socket.player = {
+			id:    id,
+			x: 	   randomInt(100, 400),
+			y: 	   randomInt(100,400),
+			angle: randomInt(0, 360)
+		}
+		if(id === 1) {
+			socket.player.car = 'car_yellow'
+			socket.player.ball = 'yellow_ball'
+		} else {
+			socket.player.car = 'car_blue'
+			socket.player.ball = 'blue_ball'
+		}
+		
 		socket.emit('clientplayer', socket.player)
 		socket.emit('allplayers', getAllPlayers(socket.player.id))
 		socket.broadcast.emit('newplayer', socket.player)
 		
 		socket.on('disconnect', function() {
+			if (server.firstPlayer.number === socket.player.id) {
+				server.firstPlayer.used = false
+			} else if (server.secondPlayer.number === socket.player.id) {
+				server.secondPlayer.used = false
+			}
 			io.emit('remove', socket.player.id)
+		})
+		
+		socket.on('move', function(data) {
+			socket.player.x = data.state.x
+			socket.player.y = data.state.y
+			socket.player.angle = data.state.angle
+			console.log(data)
+			socket.broadcast.emit('remotemoved', data)
 		})
 	})
 })

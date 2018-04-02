@@ -3,11 +3,15 @@
 <head>
     <meta charset="utf-8" />
     <title>My Page</title>
+
+    <script>
+        const Game = {}
+    </script>
+
     <script src="game/utils.js"></script>
     
     <script src="phaser.js"></script>
     <script src="/socket.io/socket.io.js"></script>
-    <script src="game/client.js"></script>
 
     <script src="game/components/ammunition.js"></script>
     <script src="game/components/coin.js"></script>
@@ -15,6 +19,8 @@
     <script src="game/components/weapon.js"></script>
     <script src="game/components/controlls.js"></script>
     <script src="game/components/player.js"></script>
+    <script src="game/components/clientPlayer.js"></script>
+    <script src="game/components/remotePlayer.js"></script>
 
     <script src="game/states/boot.js"></script>
     <script src="game/states/load.js"></script>
@@ -22,6 +28,7 @@
     <script src="game/states/play.js"></script>
     <script src="game/states/win.js"></script>
     
+    <script src="game/client.js"></script>
     <script src="game/game.js"></script>
 </head>
 <body>

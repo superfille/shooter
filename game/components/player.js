@@ -4,21 +4,26 @@ const coinsToShoot = 3
 const immunTime = 1500
 const immunEffectTime = 250
 
-function Player(name, playerSprite, x, y, angle, bulletSprite) {
-	this.name = name
-	this.isImmun = false
-	this.player = Game.game.add.sprite(x, y, playerSprite)
-	this.player.anchor.set(0.5)
-	this.player.angle = angle
+class Player {
+	constructor(data) {
+		this.id = data.id
+		this.name = data.name
+		this.isImmun = false
+		this.player = Game.game.add.sprite(data.x, data.y, data.car)
+		this.player.anchor.set(0.5)
+		this.player.angle = data.angle
 
-	Game.game.physics.arcade.enable(this.player)
-	this.player.body.collideWorldBounds = true
+		Game.game.physics.arcade.enable(this.player)
+		this.player.body.collideWorldBounds = true
 
-	this.hearts = Heart.initialize(3, this.hudX, this.hudY)
-	this.coins = Coin.initialize(0, this.hudX, this.hudY)
-	this.weapon = Weapon.initialize(this.player, bulletSprite)
-	
-	this.addHud = function(x, y) {
+		this.hearts = Heart.initialize(3, this.hudX, this.hudY)
+		this.coins = Coin.initialize(0, this.hudX, this.hudY)
+		this.weapon = Weapon.initialize(this.player, data.bullet)
+
+		this.initExplosionParticles()
+	}
+
+	addHud (x, y) {
 		this.hudX = 32
 		this.hudY = 32
 		this.text = Game.game.add.text(this.hudX, this.hudY, this.name,
@@ -30,27 +35,36 @@ function Player(name, playerSprite, x, y, angle, bulletSprite) {
 		)
 	}
 
-	this.addMovement = function(component) {
-		this.movement = component
+	sendState (state) {
+		if (!state || !state.action) {
+			return
+		}
+
+		// if (this.latestState && this.latestState.action === state.action) {
+		// 	return
+		// }
+
+		this.latestState = Object.assign({}, state)
+		Client.sendMove(this.id, state)
 	}
 
-	this.addCoin = function() {
+	addCoin () {
 		Coin.add(this.coins)
 	}
 
-	this.removeCoins = function() {
+	removeCoins () {
 		Coin.removeAll(this.coins)
 	}
 
-	this.addHeart = function() {
+	addHeart () {
 		Heart.add(this.hearts)
 	}
 
-	this.removeHeart = function() {
+	removeHeart () {
 		Heart.remove(this.hearts)
 	}
 
-	this.shoot = function() {
+	shoot () {
 		if(this.coins.children.length === coinsToShoot) {
 		//if(true) { // Fire whenever
 			this.removeCoins()
@@ -58,23 +72,14 @@ function Player(name, playerSprite, x, y, angle, bulletSprite) {
 		}
 	}
 
-	this.update = function() {
-		if (!this.player.alive) return
-
-		this.player.body.velocity.x = 0
-		this.player.body.velocity.y = 0
-	
-		this.player.body.angularVelocity = this.movement.getAngularVelocity(angularVelocity)
-		
-		Game.game.physics.arcade.velocityFromAngle(this.player.angle, forwardVelocity, this.player.body.velocity)
-	
+	update () {
 	}
 
-	this.collideLayer = function(collisonLayer) {
+	collideLayer (collisonLayer) {
 		game.physics.arcade.collide(this.player, collisonLayer)
 	}
 
-	this.isHit = function(enemyBullets) {
+	isHit (enemyBullets) {
 		if(!this.isImmun) {
 			game.physics.arcade.overlap(this.player, enemyBullets, function() {
 				this.hit()
@@ -82,7 +87,7 @@ function Player(name, playerSprite, x, y, angle, bulletSprite) {
 		}
 	}
 
-	this.hit = function() {
+	hit () {
 		if(this.hearts) {
 			if(this.hearts.children.length <= 1) {
 				this.die()
@@ -94,7 +99,7 @@ function Player(name, playerSprite, x, y, angle, bulletSprite) {
 		}
 	}
 
-	this.immunEffect = function() {
+	immunEffect () {
 		that = this
 		let blink = true
 		const orgTint = this.player.tint
@@ -108,11 +113,11 @@ function Player(name, playerSprite, x, y, angle, bulletSprite) {
 		}, immunEffectTime)
 	}
 
-	this.clearImmunEffect = function(interval) {
+	clearImmunEffect (interval) {
 		clearInterval(interval)
 	}
 
-	this.setImmun = function() {
+	setImmun () {
 		interval = this.immunEffect()
 		that = this
 		this.isImmun = true
@@ -122,7 +127,7 @@ function Player(name, playerSprite, x, y, angle, bulletSprite) {
 		}, immunTime)
 	}
 
-	this.die = function() {
+	die () {
 		if (this.dieSound) {
 			this.dieSound.play()
 		}
@@ -130,32 +135,34 @@ function Player(name, playerSprite, x, y, angle, bulletSprite) {
 		this.dieEffect()
 	}
 
-	this.addAmmunition = function() {
+	addAmmunition () {
 		if(this.coins.children.length < 3) {
 			this.addCoin()
 		}
 	}
 
-	this.addDieSound = function(sound) {
+	addDieSound (sound) {
 		this.dieSound = game.add.audio(sound)
 	}
 
-	this.isAlive = function() {
+	isAlive () {
 		return this.player.alive
 	}
 
-	this.explosionParticle = function(x, y, key, frame) {  
+	explosionParticle (x, y, key, frame) {  
 		Phaser.Particle.call(this, game, x, y, key, frame);
 	}
 	
-	this.explosionParticle.prototype = Object.create(Phaser.Particle.prototype)  
-	this.explosionParticle.prototype.constructor = this.explosionParticle; 
-	this.explosionParticle.prototype.onEmit = function() {  
-		this.animations.add('explosion', Phaser.Animation.generateFrameNames("explosion_",  1, 11, ".png", 2))
-		this.animations.play('explosion', 20, false, true)
+	initExplosionParticles () {
+		this.explosionParticle.prototype = Object.create(Phaser.Particle.prototype)  
+		this.explosionParticle.prototype.constructor = this.explosionParticle; 
+		this.explosionParticle.prototype.onEmit = function() {  
+			this.animations.add('explosion', Phaser.Animation.generateFrameNames("explosion_",  1, 11, ".png", 2))
+			this.animations.play('explosion', 20, false, true)
+		}
 	}
 
-	this.dieEffect = function() {  
+	dieEffect () {  
 		emitter = Game.game.add.emitter(this.player.x, this.player.y, 6)
 		emitter.particleClass = this.explosionParticle
 		emitter.makeParticles('explosion')
