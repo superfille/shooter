@@ -69,7 +69,6 @@ io.on('connection', function(socket) {
 			socket.player.x = data.state.x
 			socket.player.y = data.state.y
 			socket.player.angle = data.state.angle
-			console.log(data)
 			socket.broadcast.emit('remotemoved', data)
 		})
 	})
