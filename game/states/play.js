@@ -8,6 +8,19 @@ const playState = {
 	},
 
 	update() {
+		Game.entityManager.updateWorldState()
+
+		if (Game.clientPlayer == null) {
+			return  // Not connected yet.
+		}
+
+		 // Process inputs.
+		Game.clientPlayer.update()
+
+		// Interpolate other entities.
+		Game.entityManager.interpolateEntities()
+		
+
 		// if(clientPlayer === undefined) return
 		// if(!clientPlayer.isAlive()) {
 		// 	this.win()
@@ -17,10 +30,10 @@ const playState = {
 		// }
 
 		//this.ammunitionUpdate()
-		Game.players.forEach((player) => {
-			player.update()
+		//Game.players.forEach((player) => {
+		//	player.update()
 			//player.isHit(remotePlayer.weapon.bullets)
-		})
+		//})
 		//clientPlayer.update()
 		//remotePlayer.update()
 	

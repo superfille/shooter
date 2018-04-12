@@ -2,41 +2,71 @@ class ClientPlayer extends Player {
 	constructor(data) {
 		super(data)
 	
-		this.controlls = new Controlls (
-			{
-				left:    Phaser.KeyCode.A,
-				right:   Phaser.KeyCode.D,
-				fire:    Phaser.KeyCode.SPACEBAR	
-			}
-		)
+		this.controlls = {
+			forward : Game.addKey(Phaser.KeyCode.W),
+			left    : Game.addKey(Phaser.KeyCode.A),
+			right   : Game.addKey(Phaser.KeyCode.D),
+			fire    : Game.addKey(Phaser.KeyCode.SPACEBAR)
+		}
+
+		this.startSendingUpdates()
 	}
 
 	update() {
-		if (!this.player.alive) return
-		const keyDown = this.controlls.getKeyDown()
+		if (!this.sprite.alive) return
 
-		this.player.body.velocity.x = 0
-		this.player.body.velocity.y = 0
-	
+		this.sprite.body.velocity.x = 0
+		this.sprite.body.velocity.y = 0
+		this.sprite.body.angularVelocity = 0
+
+		const input = {
+			left: this.controlls.left.isDown,
+			right: this.controlls.right.isDown,
+			forward: this.controlls.forward.isDown,
+		}
+		
+		this.applyInput(input)
+
+		const state = {
+			id: this.id,
+			x: this.sprite.x,
+			y: this.sprite.y,
+			angle: this.sprite.angle,
+			inputSequenceNumber: this.inputSequenceNumber += 1
+		}
+		
+		if(this.previousState) {
+			if(Math.round(this.previousState.x) !== Math.round(state.x) && Math.round(this.previousState.y) !== Math.round(state.y)) {
+				this.addState(state)
+				this.previousState = state
+			}
+		} else {
+			this.addState(state)
+			this.previousState = state
+		}
+	}
+
+	applyInput (input) {
 		let result = 0
-		if (keyDown === Phaser.KeyCode.LEFT) {
+		if (input.left) {
 			result = -angularVelocity
-		} else if (keyDown === Phaser.KeyCode.RIGHT) {
+		}
+		else if (input.right) {
 			result = angularVelocity
 		}
-
-		// Client
-		this.player.body.angularVelocity = result
-		Game.game.physics.arcade.velocityFromAngle(this.player.angle, forwardVelocity, this.player.body.velocity)
 		
-		// if (keyDown === Phaser.KeyCode.SPACEBAR) {
+		if (input.forward) {
+			this.sprite.body.angularVelocity = result
+			Game.game.physics.arcade.velocityFromAngle(this.sprite.angle, forwardVelocity, this.sprite.body.velocity)
+		}
+
+		// if (input.fire) {
 		// 	this.shoot()
 		// }
-		this.sendState({
-			action: keyDown,
-			x: this.player.x,
-			y: this.player.y,
-			angle: this.player.angle
-		})
+	}
+
+	authoritativeUpdate(state) {
+		const tween = Game.game.add.tween(this.sprite)
+		tween.to( { x: state.x, y: state.y, angle: state.angle}, 20, Phaser.Easing.Linear.None, true)
 	}
 }

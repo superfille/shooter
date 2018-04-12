@@ -1,5 +1,4 @@
 Game.initialize = function(width, height) {
-	this.players = []
 	this.ammunition = {}
 	this.text = {}
 	this.addAmmo = true
@@ -14,6 +13,8 @@ Game.initialize = function(width, height) {
 	this.width = width
 	this.height = height
 	this.game = new Phaser.Game(this.width, this.height, Phaser.AUTO, '')
+
+	this.entityManager = new EntityManager()
 
 	this.initStates()
 }
@@ -33,27 +34,21 @@ Game.startState = function(state) {
 }
 
 Game.removePlayer = function (id) {
-	const player = this.players.find((player) => player.id === id)
-	delete player
+	this.entityManager.remove(id)
 }
 
-Game.addRemotePlayerMove = function(data) {
-	const player = this.players.find((player) => player.id === data.id)
-	if (player) {
-		player.setState(data.state)
-	}
+Game.updateWorldState = function(worldState) {
+	this.entityManager.updateWorldState(worldState)
 }
 
 Game.createClientPlayer = function(data) {
+	console.log(data)
 	this.clientPlayer = new ClientPlayer(data)
-
-	this.players.push(this.clientPlayer)
 }
 
 Game.addRemotePlayer = function(data) {
-	console.log("Remote player ", data)
 	const player = new RemotePlayer(data)
-	this.players.push(player)
+	this.entityManager.add(player)
 }
 
 Game.addAudio = function (audio) {

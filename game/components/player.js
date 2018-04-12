@@ -4,21 +4,22 @@ const coinsToShoot = 3
 const immunTime = 1500
 const immunEffectTime = 250
 
-class Player {
+class Player extends Entity {
 	constructor(data) {
+		super(data)
 		this.id = data.id
 		this.name = data.name
 		this.isImmun = false
-		this.player = Game.game.add.sprite(data.x, data.y, data.car)
-		this.player.anchor.set(0.5)
-		this.player.angle = data.angle
+		this.sprite = Game.game.add.sprite(data.x, data.y, data.car)
+		this.sprite.anchor.set(0.5)
+		this.sprite.angle = data.angle
 
-		Game.game.physics.arcade.enable(this.player)
-		this.player.body.collideWorldBounds = true
+		Game.game.physics.arcade.enable(this.sprite)
+		this.sprite.body.collideWorldBounds = true
 
 		this.hearts = Heart.initialize(3, this.hudX, this.hudY)
 		this.coins = Coin.initialize(0, this.hudX, this.hudY)
-		this.weapon = Weapon.initialize(this.player, data.bullet)
+		this.weapon = Weapon.initialize(this.sprite, data.bullet)
 
 		this.initExplosionParticles()
 	}
@@ -34,20 +35,9 @@ class Player {
 			}
 		)
 	}
-
-	sendState (state) {
-		if (!state || !state.action) {
-			return
-		}
-
-		// if (this.latestState && this.latestState.action === state.action) {
-		// 	return
-		// }
-
-		this.latestState = Object.assign({}, state)
-		Client.sendMove(this.id, state)
+	setState() {
+		
 	}
-
 	addCoin () {
 		Coin.add(this.coins)
 	}
@@ -76,12 +66,12 @@ class Player {
 	}
 
 	collideLayer (collisonLayer) {
-		game.physics.arcade.collide(this.player, collisonLayer)
+		game.physics.arcade.collide(this.sprite, collisonLayer)
 	}
 
 	isHit (enemyBullets) {
 		if(!this.isImmun) {
-			game.physics.arcade.overlap(this.player, enemyBullets, function() {
+			game.physics.arcade.overlap(this.sprite, enemyBullets, function() {
 				this.hit()
 			}, null, this)
 		}
@@ -102,7 +92,7 @@ class Player {
 	immunEffect () {
 		that = this
 		let blink = true
-		const orgTint = this.player.tint
+		const orgTint = this.sprite.tint
 		return setInterval(function(){
 			if(blink) {
 				that.player.tint = 0xf44336
@@ -131,7 +121,7 @@ class Player {
 		if (this.dieSound) {
 			this.dieSound.play()
 		}
-		this.player.kill()
+		this.sprite.kill()
 		this.dieEffect()
 	}
 
@@ -146,7 +136,7 @@ class Player {
 	}
 
 	isAlive () {
-		return this.player.alive
+		return this.sprite.alive
 	}
 
 	explosionParticle (x, y, key, frame) {  
@@ -163,7 +153,7 @@ class Player {
 	}
 
 	dieEffect () {  
-		emitter = Game.game.add.emitter(this.player.x, this.player.y, 6)
+		emitter = Game.game.add.emitter(this.sprite.x, this.sprite.y, 6)
 		emitter.particleClass = this.explosionParticle
 		emitter.makeParticles('explosion')
 		emitter.width = 20

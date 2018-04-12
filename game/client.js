@@ -5,12 +5,12 @@ Client.askNewPlayer = function() {
 	Client.socket.emit('newplayer')
 }
 
-Client.sendMove = function(id, state) {
-	Client.socket.emit('move', { id: id, state: state })
+Client.sendState = function(state) {
+	Client.socket.emit('move', { state: state })
 }
 
-Client.socket.on('remotemoved', function(data) {
-	Game.addRemotePlayerMove(data)
+Client.socket.on('updatestate', function(worldState) {
+	Game.updateWorldState(worldState)
 })
 
 Client.socket.on('clientplayer', function(data) {
@@ -24,9 +24,11 @@ Client.socket.on('newplayer', function(data) {
 })
 
 Client.socket.on('allplayers', function(data) {
-	data.forEach(element => {
-		Game.addRemotePlayer(element)
-	});
+	if (data) {
+		data.forEach(element => {
+			Game.addRemotePlayer(element)
+		});
+	}
 })
 
 Client.socket.on('remove', function(id) {
