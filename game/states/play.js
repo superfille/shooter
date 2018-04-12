@@ -1,6 +1,6 @@
 const playState = {
 	create() {
-		this.initMusic()
+		//this.initMusic()
 		Game.game.physics.startSystem(Phaser.Physics.ARCADE)
 		Game.game.stage.disableVisibilityChange = true
 		this.createMap()

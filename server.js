@@ -21,14 +21,15 @@ server.listen(8081, '0.0.0.0', function() {
 	console.log("Listening on " + server.address().port)
 })
 
-server._updateRate = 10
+server._updateRate = 1
 server._entities = []
 server._ids = 0
 
 server._setUpdate = function() {
 	server.update_interval = setInterval(
 		() => server._update(),
-		1000 / server._updateRate
+		2000
+		//1000 / server._updateRate
 	)
 }()
 
@@ -62,7 +63,6 @@ server._getPlayers = function(id) {
 server._applyInput = function(data) {
 	const state = data.state
 	const entity = server._getEntity(state.id)
-	console.log("Changing entiy", entity)
 	entity.x = state.x
 	entity.y = state.y
 	entity.angle = state.angle

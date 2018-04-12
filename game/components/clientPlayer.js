@@ -25,29 +25,32 @@ class ClientPlayer extends Player {
 			forward: this.controlls.forward.isDown,
 		}
 		
-		this.applyInput(input)
+		const hasChanged = this.applyInput(input)
 
-		const state = {
-			id: this.id,
-			x: this.sprite.x,
-			y: this.sprite.y,
-			angle: this.sprite.angle,
-			inputSequenceNumber: this.inputSequenceNumber += 1
-		}
-		
-		if(this.previousState) {
-			if(Math.round(this.previousState.x) !== Math.round(state.x) && Math.round(this.previousState.y) !== Math.round(state.y)) {
+		if (hasChanged) {
+			const state = {
+				id: this.id,
+				x: this.sprite.x,
+				y: this.sprite.y,
+				angle: this.sprite.angle,
+				inputSequenceNumber: this.inputSequenceNumber += 1
+			}
+			
+			if(this.previousState) {
+				if(Math.round(this.previousState.x) !== Math.round(state.x) && Math.round(this.previousState.y) !== Math.round(state.y)) {
+					this.addState(state)
+					this.previousState = state
+				}
+			} else {
 				this.addState(state)
 				this.previousState = state
 			}
-		} else {
-			this.addState(state)
-			this.previousState = state
 		}
 	}
 
 	applyInput (input) {
 		let result = 0
+		let hasChanged = false
 		if (input.left) {
 			result = -angularVelocity
 		}
@@ -58,8 +61,9 @@ class ClientPlayer extends Player {
 		if (input.forward) {
 			this.sprite.body.angularVelocity = result
 			Game.game.physics.arcade.velocityFromAngle(this.sprite.angle, forwardVelocity, this.sprite.body.velocity)
+			hasChanged = true
 		}
-
+		return hasChanged
 		// if (input.fire) {
 		// 	this.shoot()
 		// }

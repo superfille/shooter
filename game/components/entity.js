@@ -24,7 +24,6 @@ class Entity {
 				// }
 
 				if (state) {
-					console.log("Sending state", state)
 					Client.sendState(state)
 				//	this.previousState = state
 				}

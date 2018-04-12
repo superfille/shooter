@@ -73,7 +73,6 @@ class EntityManager {
 				// Received the position of an entity other than this client's.
 				// Add it to the position buffer.
 				var timestamp = +new Date()
-				console.log("Adding to buffer", entity, state)
 				entity.positionBuffer.push({
 					timestamp: timestamp,
 					position: state
@@ -85,10 +84,9 @@ class EntityManager {
 	interpolateEntities() {
 		// Compute render timestamp.
 		const now = +new Date()
-		const render_timestamp = now - (1000.0 / this.updateRate)
-	   
-		 for (let i in this.entities) { 
-		   const entity = this.entities[i]
+		const render_timestamp = now - 2000//(1000.0 / 1)
+		for (let i in this.entities) { 
+		   	const entity = this.entities[i]
 	   
 			// No point in interpolating this client's entity.
 			if (entity.id === Game.clientPlayer.id) {
@@ -101,6 +99,7 @@ class EntityManager {
 			// Drop older positions.
 			while (buffer.length >= 2 && buffer[1].timestamp <= render_timestamp) {
 				buffer.shift()
+				console.log("shifted", buffer)
 			}
 	   
 		   // Interpolate between the two surrounding authoritative positions.
@@ -119,11 +118,10 @@ class EntityManager {
 
 				entity.x = x0 + (x1 - x0) * (render_timestamp - t0) / (t1 - t0)
 				entity.y = y0 + (y1 - y0) * (render_timestamp - t0) / (t1 - t0)
-				console.log("Trying to apply", entity)
 				entity.applyUpdate({
 					x: x0 + (x1 - x0) * (render_timestamp - t0) / (t1 - t0),
 					y: y0 + (y1 - y0) * (render_timestamp - t0) / (t1 - t0),
-					angle: buffer[1].angle // probably chnage this
+					angle: buffer[1].position.angle // probably chnage this
 				})
 			}
 		}
