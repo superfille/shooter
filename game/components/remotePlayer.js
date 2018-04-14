@@ -5,7 +5,6 @@ class RemotePlayer extends Player {
 	}
 
 	applyUpdate(state) {
-		console.log("Updating remote player",state)
 		// if (!this.sprite.alive) return
 
 		if (state) {
@@ -16,7 +15,7 @@ class RemotePlayer extends Player {
 				this.tween.timeline[0].dt = 0
 			} else {
 				this.tween = Game.game.add.tween(this.sprite)
-				this.tween.to( { x: state.x, y: state.y, angle: state.angle}, 20, Phaser.Easing.Linear.None, true);
+				this.tween.to( { x: state.x, y: state.y, angle: state.angle}, 0, Phaser.Easing.Linear.None, true);
 			}
 		}
 	}

@@ -32,8 +32,44 @@ class Entity {
 	}
 
 	addState(state) {
-		console.log("adding state", state)
 		this.pendingStates.push(state)
+		while(this.pendingStates.length > 1) {
+			this.pendingStates.shift()
+		}
+	}
+
+	addToPositionBuffer(state) {
+		this.positionBuffer.push(state)
+		// while (this.positionBuffer.length > 2 ) {
+		// 	this.positionBuffer.shift()
+		// }
+	}
+
+	getPositionBufferStates() {	
+		if (this.positionBuffer.length < 2) {
+			return null
+		} else {
+			return {
+				0: {
+					x: this.positionBuffer[0].x,
+					y: this.positionBuffer[0].y,
+					angle: this.positionBuffer[0].angle,
+					timestamp: this.positionBuffer[0].timestamp
+				},
+				1: {
+					x: this.positionBuffer[1].x,
+					y: this.positionBuffer[1].y,
+					angle: this.positionBuffer[1].angle,
+					timestamp: this.positionBuffer[1].timestamp
+				}
+			}
+		}
+	}
+
+	dropOlderBufferPositions(time) {
+		while (this.positionBuffer.length >= 2 && this.positionBuffer[1].timestamp <= time) {
+			buffer.shift()
+		}
 	}
 
 	applyInput() {

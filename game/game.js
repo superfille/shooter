@@ -42,12 +42,15 @@ Game.updateWorldState = function(worldState) {
 }
 
 Game.createClientPlayer = function(data) {
-	console.log(data)
-	this.clientPlayer = new ClientPlayer(data)
+	if (this.entityManager.client) {
+		this.entityManager.remove(this.entityManager.client.id)
+	}
+	const player = this.entityManager.entityFactory.create(data, true)
+	this.entityManager.addClient(player)
 }
 
 Game.addRemotePlayer = function(data) {
-	const player = new RemotePlayer(data)
+	const player = this.entityManager.entityFactory.create(data)
 	this.entityManager.add(player)
 }
 

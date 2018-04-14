@@ -1,5 +1,5 @@
 class EntityFactory {
-	create(state) {
+	create(state, isClient) {
 		let entity = {}
 		if (state.type === "bullet") {
 			entity.name = "Bullet"
@@ -8,18 +8,20 @@ class EntityFactory {
 			entity.name = "PowerUp"
 		}
 		else if (state.isPlayer) {
-			entity = new RemotePlayer(state)
+			if (isClient) {
+				entity = new ClientPlayer(state)
+			} else {
+				entity = new RemotePlayer(state)
+			}
 		}
-		// else {
-		// 	return null
-		// }
+		else {
+			return null
+		}
 
 		// entity.id = state.id
 		// entity.x = state.x
 		// entity.y = state.y
 		// entity.angle = state.angle
-		console.log("Creating entity", entity)
-		console.log(entity.positionBuffer)
 		return entity
 	}
 }

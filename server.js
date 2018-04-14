@@ -21,25 +21,37 @@ server.listen(8081, '0.0.0.0', function() {
 	console.log("Listening on " + server.address().port)
 })
 
-server._updateRate = 1
+server._updateRate = 30
 server._entities = []
 server._ids = 0
 
 server._setUpdate = function() {
 	server.update_interval = setInterval(
 		() => server._update(),
-		2000
-		//1000 / server._updateRate
+		1000 / server._updateRate
 	)
 }()
 
 server._update = function() {
+	if (server._entities.length <= 0) return
+
 	const sockets = io.sockets.sockets
 	// TODO: behöver bara uppdatera om något ändrats
 	for (var id in sockets) {
 		const socket = sockets[id]
-		socket.emit('updatestate', { worldState: server._entities })
+		socket.emit('updatestate', { worldState: this._getCleanWorldState() })
 	}
+}
+
+server._getCleanWorldState = function() {
+	return server._entities.map((entity) => {
+		return {
+			id: entity.id,
+			x: entity.x,
+			y: entity.y,
+			angle: entity.angle
+		}
+	})
 }
 
 server._validateInput = function(input) {
@@ -79,18 +91,17 @@ io.on('connection', function(socket) {
 
 	socket.on('newplayer', function() {
 		const id = server._ids += 1
-		const activePlayers = io.sockets.sockets.length
-
+		const activePlayers = Object.keys(io.sockets.sockets).length
 		const player = {
 			id:    id,
 			x: 	   randomInt(100, 400),
-			y: 	   randomInt(100,400),
+			y: 	   randomInt(100, 400),
 			angle: randomInt(0, 360),
 			isPlayer: true
 		}
 
 		socket.playerId = id
-		if (!activePlayers) {
+		if (activePlayers === 0) {
 			player.car = 'car_yellow'
 			player.ball = 'yellow_ball'
 		} else {

@@ -16,6 +16,7 @@ class EntityManager {
 
 	addClient(entity) {
 		this.client = entity
+		this.add(entity)
 	}
 
 	remove(id) {
@@ -35,8 +36,10 @@ class EntityManager {
 	}
 
 	updateWorldState(entities) {
-		if (!entities) {
-			entities = this.entities
+		if (!entities || !entities.worldState) {
+			return entities = this.entities
+		} else {
+			entities = entities.worldState
 		}
 		// World state is a list of entity states.
 		for (let i = 0; i < entities.length; i++) {
@@ -45,27 +48,29 @@ class EntityManager {
 			// If this is the first time we see this entity, create a local representation.
 			if (!this.getEntity(state.id)) {
 				const entity = this.entityFactory.create(state)
-				this.add(entity)
+				if (entity) {
+					this.add(entity)
+				}
 			}
 
 			const entity = this.getEntity(state.id)
-			if (state.id == Game.clientPlayer.id) {
+			if (this.client && this.client.id === state.id) {
 				// Received the authoritative position of this client's entity.
-				Game.clientPlayer.authoritativeUpdate(state)
+				//Game.clientPlayer.authoritativeUpdate(state)
 
 				// Server Reconciliation. Re-apply all the inputs not yet processed by
 				// the server.
 				let j = 0
-				while (j < Game.player.pendingStates.length) {
-					const input = this.pendingStates[j]
+				while (j < this.client.pendingStates.length) {
+					const input = this.client.pendingStates[j]
 					if (input.inputSequenceNumber <= state.lastProcessedInput) {
 						// Already processed. Its effect is already taken into account into the world update
 						// we just got, so we can drop it.
-						Game.player.pendingStates.splice(j, 1)
+						this.client.pendingStates.splice(j, 1)
 					}
 					else {
 						// Not processed by the server yet. Re-apply it.
-						this.clientPlayer.applyInput(input)
+						this.client.applyInput(input)
 						j += 1
 					}
 				}
@@ -73,10 +78,10 @@ class EntityManager {
 				// Received the position of an entity other than this client's.
 				// Add it to the position buffer.
 				var timestamp = +new Date()
-				entity.positionBuffer.push({
-					timestamp: timestamp,
-					position: state
-				})
+				if (entity) {
+					state.timestamp = timestamp
+					entity.addToPositionBuffer(state)
+				}
 			}
 		}
 	}
@@ -84,12 +89,12 @@ class EntityManager {
 	interpolateEntities() {
 		// Compute render timestamp.
 		const now = +new Date()
-		const render_timestamp = now - 2000//(1000.0 / 1)
+		const render_timestamp = now - (1000 / 30)
 		for (let i in this.entities) { 
 		   	const entity = this.entities[i]
 	   
 			// No point in interpolating this client's entity.
-			if (entity.id === Game.clientPlayer.id) {
+			if (entity.id === this.client.id) {
 				continue
 			}
 
@@ -99,30 +104,28 @@ class EntityManager {
 			// Drop older positions.
 			while (buffer.length >= 2 && buffer[1].timestamp <= render_timestamp) {
 				buffer.shift()
-				console.log("shifted", buffer)
 			}
 	   
 		   // Interpolate between the two surrounding authoritative positions.
-			if (buffer.length >= 2 && buffer[0].timestamp <= render_timestamp && render_timestamp <= buffer[1].timestamp) {
-				const x0 = buffer[0].position.x
-				const x1 = buffer[1].position.x
+			if (buffer && buffer.length >= 2 && buffer[0].timestamp <= render_timestamp && render_timestamp <= buffer[1].timestamp) {
+				const states = entity.getPositionBufferStates()
+				const x0 = states[0].x
+				const x1 = states[1].x
 				
-				const y0 = buffer[0].position.y
-				const y1 = buffer[1].position.y
+				const y0 = states[0].y
+				const y1 = states[1].y
 
-				const angle0 = buffer[0].position.angle
-				const angle1 = buffer[1].position.angle
+				const angle0 = states[0].angle
+				const angle1 = states[1].angle
 
-				const t0 = buffer[0].timestamp
-				const t1 = buffer[1].timestamp
+				const t0 = states[0].timestamp
+				const t1 = states[1].timestamp
 
-				entity.x = x0 + (x1 - x0) * (render_timestamp - t0) / (t1 - t0)
-				entity.y = y0 + (y1 - y0) * (render_timestamp - t0) / (t1 - t0)
-				entity.applyUpdate({
-					x: x0 + (x1 - x0) * (render_timestamp - t0) / (t1 - t0),
-					y: y0 + (y1 - y0) * (render_timestamp - t0) / (t1 - t0),
-					angle: buffer[1].position.angle // probably chnage this
-				})
+				entity.sprite.x = x0 + (x1 - x0) * (render_timestamp - t0) / (t1 - t0)
+				entity.sprite.y = y0 + (y1 - y0) * (render_timestamp - t0) / (t1 - t0)
+				entity.sprite.angle = states[1].angle
+
+				//entity.applyUpdate(buffer)
 			}
 		}
 	}

@@ -10,12 +10,12 @@ const playState = {
 	update() {
 		Game.entityManager.updateWorldState()
 
-		if (Game.clientPlayer == null) {
+		if (Game.entityManager.client == null) {
 			return  // Not connected yet.
 		}
 
 		 // Process inputs.
-		Game.clientPlayer.update()
+		Game.entityManager.client.update()
 
 		// Interpolate other entities.
 		Game.entityManager.interpolateEntities()
