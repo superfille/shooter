@@ -6,7 +6,6 @@ var express = require('express');
 var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io').listen(server);
-var timeStep = 1000 / 20 //
 // Request logging
 app.use(function(req, res, next) {
     next();
@@ -68,8 +67,15 @@ server._addEntity = function(entity) {
 	}
 }
 
+server._removeEntity = function(id) {
+	let position = -1
+	if((position = server._entities.findIndex((entity) => entity.id === id)) >= 0) {
+		server._entities.splice(position, 1)
+	}
+}
+
 server._getPlayers = function(id) {
-	server._entities.filter((entity) => entity.isPlayer && entity.id !== id)
+	return server._entities.filter((entity) => entity.id !== id)
 }
 
 server._applyInput = function(data) {
@@ -118,6 +124,7 @@ io.on('connection', function(socket) {
 
 		socket.on('disconnect', function() {
 			io.emit('remove', socket.playerId)
+			server._removeEntity(socket.playerId)
 		})
 		
 		socket.on('move', function(data) {

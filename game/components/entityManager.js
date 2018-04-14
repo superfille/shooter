@@ -10,6 +10,16 @@ class EntityManager {
 		}
 	}
 
+	createEntity(entity) {
+		let ent = this.getEntity(entity.id)
+		if (ent) {
+			ent = Object.assign(ent, entity)
+		} else {
+			ent = this.entityFactory.create(entity)
+			this.add(ent)
+		}
+	}
+
 	getEntity(id) {
 		return this.entities.find((entity) => entity.id === id)
 	}
@@ -20,8 +30,11 @@ class EntityManager {
 	}
 
 	remove(id) {
+		let position = -1
 		if((position = this.entities.findIndex((entity) => entity.id === id)) >= 0) {
+			const entity = this.entities[position]
 			this.entities.splice(position, 1)
+			entity.remove()
 		}
 	}
 
@@ -54,34 +67,10 @@ class EntityManager {
 			}
 
 			const entity = this.getEntity(state.id)
-			if (this.client && this.client.id === state.id) {
-				// Received the authoritative position of this client's entity.
-				//Game.clientPlayer.authoritativeUpdate(state)
-
-				// Server Reconciliation. Re-apply all the inputs not yet processed by
-				// the server.
-				let j = 0
-				while (j < this.client.pendingStates.length) {
-					const input = this.client.pendingStates[j]
-					if (input.inputSequenceNumber <= state.lastProcessedInput) {
-						// Already processed. Its effect is already taken into account into the world update
-						// we just got, so we can drop it.
-						this.client.pendingStates.splice(j, 1)
-					}
-					else {
-						// Not processed by the server yet. Re-apply it.
-						this.client.applyInput(input)
-						j += 1
-					}
-				}
-			} else {
-				// Received the position of an entity other than this client's.
-				// Add it to the position buffer.
+			if (entity && this.client !== entity) {
 				var timestamp = +new Date()
-				if (entity) {
-					state.timestamp = timestamp
-					entity.addToPositionBuffer(state)
-				}
+				state.timestamp = timestamp
+				entity.addToPositionBuffer(state)
 			}
 		}
 	}
@@ -89,7 +78,7 @@ class EntityManager {
 	interpolateEntities() {
 		// Compute render timestamp.
 		const now = +new Date()
-		const render_timestamp = now - (1000 / 30)
+		const render_timestamp = now - (1000 / Game.updateRate)
 		for (let i in this.entities) { 
 		   	const entity = this.entities[i]
 	   
@@ -98,14 +87,10 @@ class EntityManager {
 				continue
 			}
 
+			entity.dropOlderBufferPositions(render_timestamp)
+
 			// Find the two authoritative positions surrounding the rendering timestamp.
 			const buffer = entity.positionBuffer
-			
-			// Drop older positions.
-			while (buffer.length >= 2 && buffer[1].timestamp <= render_timestamp) {
-				buffer.shift()
-			}
-	   
 		   // Interpolate between the two surrounding authoritative positions.
 			if (buffer && buffer.length >= 2 && buffer[0].timestamp <= render_timestamp && render_timestamp <= buffer[1].timestamp) {
 				const states = entity.getPositionBufferStates()

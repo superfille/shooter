@@ -26,7 +26,7 @@ Client.socket.on('newplayer', function(data) {
 Client.socket.on('allplayers', function(data) {
 	if (data) {
 		data.forEach(element => {
-			Game.addRemotePlayer(element)
+			Game.entityManager.createEntity(element)
 		});
 	}
 })

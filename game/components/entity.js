@@ -4,45 +4,26 @@ class Entity {
 		this.x = data.x
 		this.y = data.y
 		this.angle = data.angle
-		this.updateRate = 30
-		this.pendingStates = []
+		this.pendingState = null
 		this.positionBuffer = []
 		this.inputSequenceNumber = 0
 	}
 
 	startSendingUpdates() {
 		this.sendingStates = setInterval(() => {
-			if(this.pendingStates.length > 0) {
-				const state = this.pendingStates.shift()
-				
-				// if (this.previousState) {
-				// 	if(Math.round(this.previousState.x) === Math.round(state.x) &&
-				// 		Math.round(this.previousState.y) === Math.round(state.y))
-				// 	{
-				// 		return
-				// 	}
-				// }
-
-				if (state) {
-					Client.sendState(state)
-				//	this.previousState = state
-				}
+			if(this.pendingState) {
+				Client.sendState(this.pendingState)
+				this.pendingState = null
 			}
-		}, 1000 / this.updateRate)
+		}, 1000 / Game.entityUpdateRate)
 	}
 
 	addState(state) {
-		this.pendingStates.push(state)
-		while(this.pendingStates.length > 1) {
-			this.pendingStates.shift()
-		}
+		this.pendingState = state
 	}
 
 	addToPositionBuffer(state) {
 		this.positionBuffer.push(state)
-		// while (this.positionBuffer.length > 2 ) {
-		// 	this.positionBuffer.shift()
-		// }
 	}
 
 	getPositionBufferStates() {	
@@ -68,7 +49,7 @@ class Entity {
 
 	dropOlderBufferPositions(time) {
 		while (this.positionBuffer.length >= 2 && this.positionBuffer[1].timestamp <= time) {
-			buffer.shift()
+			this.positionBuffer.shift()
 		}
 	}
 
@@ -78,5 +59,11 @@ class Entity {
 
 	applyUpdate() {
 		
+	}
+
+	remove() {
+		if (this.sprite) {
+			this.sprite.kill()
+		}
 	}
 }

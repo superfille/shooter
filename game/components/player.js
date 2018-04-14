@@ -38,6 +38,7 @@ class Player extends Entity {
 	setState() {
 		
 	}
+	
 	addCoin () {
 		Coin.add(this.coins)
 	}

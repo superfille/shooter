@@ -1,4 +1,6 @@
 Game.initialize = function(width, height) {
+	this.updateRate = 30
+	this.entityUpdateRate = 10
 	this.ammunition = {}
 	this.text = {}
 	this.addAmmo = true
