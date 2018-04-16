@@ -12,6 +12,13 @@ class ClientPlayer extends Player {
 		this.startSendingUpdates()
 	}
 
+	startSendingUpdates() {
+		this.sendingStates = setInterval(() => {
+			// Send this clients player and bullet states
+			Client.sendState(this.getCurrentState())
+		}, 1000 / Game.entityUpdateRate)
+	}
+
 	update() {
 		if (!this.sprite.alive) return
 
@@ -20,29 +27,22 @@ class ClientPlayer extends Player {
 		this.sprite.body.angularVelocity = 0
 
 		const input = {
-			left: this.controlls.left.isDown,
-			right: this.controlls.right.isDown,
-			forward: this.controlls.forward.isDown,
+			left: 		this.controlls.left.isDown,
+			right: 		this.controlls.right.isDown,
+			forward: 	this.controlls.forward.isDown,
+			fire: 		this.controlls.fire.isDown
 		}
 		
 		const hasChanged = this.applyInput(input)
 
 		if (hasChanged) {
-			const state = {
-				id: this.id,
-				x: this.sprite.x,
-				y: this.sprite.y,
-				angle: this.sprite.angle,
-				inputSequenceNumber: this.inputSequenceNumber += 1
-			}
+			const state = this.getCurrentState()
 			
 			if(this.previousState) {
 				if(Math.round(this.previousState.x) !== Math.round(state.x) && Math.round(this.previousState.y) !== Math.round(state.y)) {
-					this.addState(state)
 					this.previousState = state
 				}
 			} else {
-				this.addState(state)
 				this.previousState = state
 			}
 		}
@@ -63,14 +63,11 @@ class ClientPlayer extends Player {
 			Game.game.physics.arcade.velocityFromAngle(this.sprite.angle, forwardVelocity, this.sprite.body.velocity)
 			hasChanged = true
 		}
-		return hasChanged
-		// if (input.fire) {
-		// 	this.shoot()
-		// }
-	}
+		
+		if (input.fire) {
+			this.shoot()
+		}
 
-	authoritativeUpdate(state) {
-		const tween = Game.game.add.tween(this.sprite)
-		tween.to( { x: state.x, y: state.y, angle: state.angle}, 20, Phaser.Easing.Linear.None, true)
+		return hasChanged
 	}
 }

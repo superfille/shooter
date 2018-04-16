@@ -7,19 +7,21 @@ const immunEffectTime = 250
 class Player extends Entity {
 	constructor(data) {
 		super(data)
-		this.id = data.id
+
 		this.name = data.name
-		this.isImmun = false
 		this.sprite = Game.game.add.sprite(data.x, data.y, data.car)
+		this.sprite._id = data._id
 		this.sprite.anchor.set(0.5)
 		this.sprite.angle = data.angle
+		
+		this.isImmun = false
 
 		Game.game.physics.arcade.enable(this.sprite)
 		this.sprite.body.collideWorldBounds = true
 
 		this.hearts = Heart.initialize(3, this.hudX, this.hudY)
 		this.coins = Coin.initialize(0, this.hudX, this.hudY)
-		this.weapon = Weapon.initialize(this.sprite, data.bullet)
+		this.weapon = new Weapon(this.sprite, data.ball)
 
 		this.initExplosionParticles()
 	}
@@ -34,9 +36,6 @@ class Player extends Entity {
 				align: 'center'
 			}
 		)
-	}
-	setState() {
-		
 	}
 	
 	addCoin () {
@@ -55,12 +54,22 @@ class Player extends Entity {
 		Heart.remove(this.hearts)
 	}
 
+	getCurrentState() {
+		const playerState = super.getCurrentState()
+		const result = []
+
+		result.push(...this.weapon.getLivingBullets())
+		result.push(playerState)
+
+		return result
+	}
+
 	shoot () {
-		if(this.coins.children.length === coinsToShoot) {
+		//if(this.coins.children.length === coinsToShoot) {
 		//if(true) { // Fire whenever
-			this.removeCoins()
-			this.weapon.shoot()
-		}
+			//this.removeCoins()
+		this.weapon.shoot()
+		//}
 	}
 
 	update () {

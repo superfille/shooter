@@ -2,26 +2,40 @@ class EntityManager {
 	constructor(data) {
 		this.entities = []
 		this.entityFactory = new EntityFactory()
+		this.temporaryIds = 0
+	}
+
+	getTempId() {
+		this.temporaryIds += 1
+		return "t" + this.temporaryIds
 	}
 
 	add(entity) {
-		if(!this.entities.find((ent) => ent.id === entity.id)) {
+		if(!this.entities.find((ent) => ent._id === entity._id)) {
 			this.entities.push(entity)
 		}
 	}
 
-	createEntity(entity) {
-		let ent = this.getEntity(entity.id)
-		if (ent) {
-			ent = Object.assign(ent, entity)
-		} else {
-			ent = this.entityFactory.create(entity)
-			this.add(ent)
+	createEntity(entity, isClient) {
+		const createdEntity = this.entityFactory.create(entity, isClient)
+		if (createdEntity) {
+			this.add(createdEntity)
+		}
+	}
+
+	serverState(sprite) {
+		const entity = this.getEntity(sprite._id)
+		return {
+			_id: sprite._id,
+			type: entity.type,
+			x: sprite.x,
+			y: sprite.y,
+			angle: sprite.angle
 		}
 	}
 
 	getEntity(id) {
-		return this.entities.find((entity) => entity.id === id)
+		return this.entities.find((entity) => entity._id === id)
 	}
 
 	addClient(entity) {
@@ -31,11 +45,17 @@ class EntityManager {
 
 	remove(id) {
 		let position = -1
-		if((position = this.entities.findIndex((entity) => entity.id === id)) >= 0) {
+		if((position = this.entities.findIndex((entity) => entity._id === id)) >= 0) {
 			const entity = this.entities[position]
 			this.entities.splice(position, 1)
 			entity.remove()
 		}
+	}
+
+	cleanEntityId(entity) {
+		const ent = this.getEntity(entity.tempId)
+		ent._id = entity._id
+		ent.sprite._id = entity._id
 	}
 
 	updateEntity(entity) {
@@ -49,24 +69,19 @@ class EntityManager {
 	}
 
 	updateWorldState(entities) {
-		if (!entities || !entities.worldState) {
+		if (!entities) {
 			return entities = this.entities
-		} else {
-			entities = entities.worldState
 		}
 		// World state is a list of entity states.
 		for (let i = 0; i < entities.length; i++) {
 			const state = entities[i]
-
-			// If this is the first time we see this entity, create a local representation.
-			if (!this.getEntity(state.id)) {
-				const entity = this.entityFactory.create(state)
-				if (entity) {
-					this.add(entity)
-				}
+			
+			// This entity does not exist
+			if (!this.getEntity(state._id)) {
+				return
 			}
 
-			const entity = this.getEntity(state.id)
+			const entity = this.getEntity(state._id)
 			if (entity && this.client !== entity) {
 				var timestamp = +new Date()
 				state.timestamp = timestamp
@@ -83,7 +98,7 @@ class EntityManager {
 		   	const entity = this.entities[i]
 	   
 			// No point in interpolating this client's entity.
-			if (entity.id === this.client.id) {
+			if (entity._id === this.client._id) {
 				continue
 			}
 
@@ -93,24 +108,7 @@ class EntityManager {
 			const buffer = entity.positionBuffer
 		   // Interpolate between the two surrounding authoritative positions.
 			if (buffer && buffer.length >= 2 && buffer[0].timestamp <= render_timestamp && render_timestamp <= buffer[1].timestamp) {
-				const states = entity.getPositionBufferStates()
-				const x0 = states[0].x
-				const x1 = states[1].x
-				
-				const y0 = states[0].y
-				const y1 = states[1].y
-
-				const angle0 = states[0].angle
-				const angle1 = states[1].angle
-
-				const t0 = states[0].timestamp
-				const t1 = states[1].timestamp
-
-				entity.sprite.x = x0 + (x1 - x0) * (render_timestamp - t0) / (t1 - t0)
-				entity.sprite.y = y0 + (y1 - y0) * (render_timestamp - t0) / (t1 - t0)
-				entity.sprite.angle = states[1].angle
-
-				//entity.applyUpdate(buffer)
+				entity.applyUpdate(render_timestamp)
 			}
 		}
 	}

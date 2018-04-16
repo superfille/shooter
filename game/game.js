@@ -45,7 +45,7 @@ Game.updateWorldState = function(worldState) {
 
 Game.createClientPlayer = function(data) {
 	if (this.entityManager.client) {
-		this.entityManager.remove(this.entityManager.client.id)
+		this.entityManager.remove(this.entityManager.client._id)
 	}
 	const player = this.entityManager.entityFactory.create(data, true)
 	this.entityManager.addClient(player)

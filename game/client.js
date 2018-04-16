@@ -6,7 +6,7 @@ Client.askNewPlayer = function() {
 }
 
 Client.sendState = function(state) {
-	Client.socket.emit('move', { state: state })
+	Client.socket.emit('move', state)
 }
 
 Client.socket.on('updatestate', function(worldState) {
@@ -23,7 +23,7 @@ Client.socket.on('newplayer', function(data) {
 	}
 })
 
-Client.socket.on('allplayers', function(data) {
+Client.socket.on('allentities', function(data) {
 	if (data) {
 		data.forEach(element => {
 			Game.entityManager.createEntity(element)
@@ -37,4 +37,8 @@ Client.socket.on('remove', function(id) {
 
 Client.socket.on('addAmmo', function() {
 	Game.addAmmo()
+})
+
+Client.socket.on('entityadded', function(data) {
+	Game.entityManager.cleanEntityId(data)
 })

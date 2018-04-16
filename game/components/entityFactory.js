@@ -1,27 +1,35 @@
 class EntityFactory {
+	constructor() {
+		this.types = {
+			player: 1,
+			bullet: 2,
+			carrot: 3
+		}
+	}
+
 	create(state, isClient) {
 		let entity = {}
-		if (state.type === "bullet") {
-			entity.name = "Bullet"
-		}
-		else if (state.type === "powerup") {
-			entity.name = "PowerUp"
-		}
-		else if (state.isPlayer) {
+		if (state.type === this.types.player) {
 			if (isClient) {
 				entity = new ClientPlayer(state)
-			} else {
+			}
+			else {
 				entity = new RemotePlayer(state)
 			}
+			return entity
+		}
+
+		if (state.type === this.types.bullet) {
+			console.log("Create bullet")
+			//Based on player id, create the bullet
+ 		}
+		else if (state.type === "powerup") {
+			entity.name = "PowerUp"
 		}
 		else {
 			return null
 		}
 
-		// entity.id = state.id
-		// entity.x = state.x
-		// entity.y = state.y
-		// entity.angle = state.angle
 		return entity
 	}
 }
