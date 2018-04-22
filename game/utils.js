@@ -5,3 +5,7 @@ Utils.getRandomInt = function(min, max) {
 	max = Math.floor(max)
 	return Math.floor(Math.random() * (max - min)) + min
 }
+
+Utils.objectIsEmpty = function (obj) {
+	return Object.keys(obj).length === 0 && obj.constructor === Object
+}

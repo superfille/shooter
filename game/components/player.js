@@ -54,25 +54,12 @@ class Player extends Entity {
 		Heart.remove(this.hearts)
 	}
 
-	getCurrentState() {
-		const playerState = super.getCurrentState()
-		const result = []
-
-		result.push(...this.weapon.getLivingBullets())
-		result.push(playerState)
-
-		return result
-	}
-
 	shoot () {
 		//if(this.coins.children.length === coinsToShoot) {
 		//if(true) { // Fire whenever
 			//this.removeCoins()
 		this.weapon.shoot()
 		//}
-	}
-
-	update () {
 	}
 
 	collideLayer (collisonLayer) {

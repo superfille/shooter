@@ -23,14 +23,15 @@ class EntityManager {
 		}
 	}
 
-	serverState(sprite) {
+	sendToServerState(sprite) {
 		const entity = this.getEntity(sprite._id)
 		return {
 			_id: sprite._id,
 			type: entity.type,
 			x: sprite.x,
 			y: sprite.y,
-			angle: sprite.angle
+			angle: sprite.angle,
+			timestamp: entity.timestamp
 		}
 	}
 
@@ -70,7 +71,7 @@ class EntityManager {
 
 	updateWorldState(entities) {
 		if (!entities) {
-			return entities = this.entities
+			return
 		}
 		// World state is a list of entity states.
 		for (let i = 0; i < entities.length; i++) {
@@ -83,17 +84,12 @@ class EntityManager {
 
 			const entity = this.getEntity(state._id)
 			if (entity && this.client !== entity) {
-				var timestamp = +new Date()
-				state.timestamp = timestamp
 				entity.addToPositionBuffer(state)
 			}
 		}
 	}
 
 	interpolateEntities() {
-		// Compute render timestamp.
-		const now = +new Date()
-		const render_timestamp = now - (1000 / Game.updateRate)
 		for (let i in this.entities) { 
 		   	const entity = this.entities[i]
 	   
@@ -102,14 +98,7 @@ class EntityManager {
 				continue
 			}
 
-			entity.dropOlderBufferPositions(render_timestamp)
-
-			// Find the two authoritative positions surrounding the rendering timestamp.
-			const buffer = entity.positionBuffer
-		   // Interpolate between the two surrounding authoritative positions.
-			if (buffer && buffer.length >= 2 && buffer[0].timestamp <= render_timestamp && render_timestamp <= buffer[1].timestamp) {
-				entity.applyUpdate(render_timestamp)
-			}
+			entity.update()
 		}
 	}
 }

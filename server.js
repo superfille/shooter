@@ -53,10 +53,10 @@ server._getCleanWorldState = function() {
 		return {
 			_id: entity._id,
 			type: entity.type,
-			tempId: entity.tempId,
 			x: entity.x,
 			y: entity.y,
-			angle: entity.angle
+			angle: entity.angle,
+			timestamp: entity.timestamp
 		}
 	})
 }
@@ -108,24 +108,12 @@ server._applyInput = function(data) {
 
 	data.forEach((state) => {
 		let entity = server._getEntity(state._id)
-		if (!entity) {
-			entity = {
-				_id: server._getNewId(),
-				tempId: state._id,
-				type: state.type
-			}
-			server._addEntity(entity)
-			server._addedEntity(state.playerId, entity)
-			console.log(entity)
+		if (entity) {
+			entity.x = state.x
+			entity.y = state.y
+			entity.angle = state.angle
+			entity.timestamp = state.timestamp
 		}
-
-		if (state.tempId === -1) {
-			entity.tempId = undefined
-		}
-
-		entity.x = state.x
-		entity.y = state.y
-		entity.angle = state.angle	
 	})
 }
 

@@ -5,8 +5,26 @@ Client.askNewPlayer = function() {
 	Client.socket.emit('newplayer')
 }
 
-Client.sendState = function(state) {
-	Client.socket.emit('move', state)
+Client.cleanState = function(states) {
+	if (!Array.isArray(states)) {
+		states = [states]
+	}
+
+	return states.map((state) => {
+		return {
+			_id: state._id,
+			type: state.type,
+			x: state.x,
+			y: state.y,
+			angle: state.angle,
+			timestamp: state.timestamp
+		}
+	})
+}
+
+Client.sendState = function(states) {
+	const sendReady = this.cleanState(states)
+	Client.socket.emit('move', sendReady)
 }
 
 Client.socket.on('updatestate', function(worldState) {

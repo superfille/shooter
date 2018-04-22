@@ -15,7 +15,7 @@ Game.initialize = function(width, height) {
 	this.width = width
 	this.height = height
 	this.game = new Phaser.Game(this.width, this.height, Phaser.AUTO, '')
-
+	window.game = this.game
 	this.entityManager = new EntityManager()
 
 	this.initStates()
@@ -48,6 +48,7 @@ Game.createClientPlayer = function(data) {
 		this.entityManager.remove(this.entityManager.client._id)
 	}
 	const player = this.entityManager.entityFactory.create(data, true)
+	window.player = player
 	this.entityManager.addClient(player)
 }
 

@@ -13,9 +13,14 @@ class ClientPlayer extends Player {
 	}
 
 	startSendingUpdates() {
+		// TODO: Flytta till client.js istællet och hæmta alla entities
 		this.sendingStates = setInterval(() => {
 			// Send this clients player and bullet states
-			Client.sendState(this.getCurrentState())
+			const state = this.getCurrentState()
+			if (this.stateHasChanged(state)) {
+				this.updatePreviousState(state)
+				Client.sendState(state)
+			}
 		}, 1000 / Game.entityUpdateRate)
 	}
 
@@ -34,18 +39,6 @@ class ClientPlayer extends Player {
 		}
 		
 		const hasChanged = this.applyInput(input)
-
-		if (hasChanged) {
-			const state = this.getCurrentState()
-			
-			if(this.previousState) {
-				if(Math.round(this.previousState.x) !== Math.round(state.x) && Math.round(this.previousState.y) !== Math.round(state.y)) {
-					this.previousState = state
-				}
-			} else {
-				this.previousState = state
-			}
-		}
 	}
 
 	applyInput (input) {
@@ -65,7 +58,7 @@ class ClientPlayer extends Player {
 		}
 		
 		if (input.fire) {
-			this.shoot()
+			//this.shoot()
 		}
 
 		return hasChanged
