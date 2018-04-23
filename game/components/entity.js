@@ -92,20 +92,8 @@ class Entity {
 		if (states[1].timestamp !== states[0].timestamp) {
 			let timeDiff = states[1].timestamp - states[0].timestamp
 			if (timeDiff > 200) {
+				// For when the player is standing still and the diff becomes large
 				timeDiff = 100
-			}
-			
-			let shortestAngle = Game.game.math.getShortestAngle(states[1].angle, states[0].angle)
-
-			if (Math.abs(states[0].angle) + Math.abs(shortestAngle) > 180) {
-				console.log(Math.abs(states[0].angle), Math.abs(shortestAngle))
-				if (states[0].angle < 0) {
-					this.sprite.angle = -180
-				}
-				else {
-					this.sprite.angle = 180
-				}
-				
 			}
 
 			if (this.tween && this.tween.isRunning) {
@@ -114,11 +102,14 @@ class Entity {
 				this.sprite.angle = states[0].angle
 			}
 
+			const shortestAngle = Game.game.math.getShortestAngle(states[1].angle, this.sprite.angle)
+			const newAngle = this.sprite.angle - shortestAngle
+
 			this.tween = Game.game.add.tween(this.sprite)
 			this.tween.to({
 				x: states[1].x,
 				y: states[1].y,
-				angle: states[1].angle,
+				angle: newAngle,
 			}, timeDiff, 'Linear', true)
 		}
 	}
