@@ -69,7 +69,7 @@ class EntityManager {
 
 	getRemotePlayers() {
 		return this.entities.filter((entity) => {
-			return entity.type === this.entityFactory.types.player && entity._id !== Game.client._id
+			return entity.type === this.entityFactory.types.player && entity._id !== this.client._id
 		})
 	}
 

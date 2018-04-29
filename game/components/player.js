@@ -9,6 +9,7 @@ class Player extends Entity {
 		super(data)
 
 		this.name = data.name
+		this.type = data.type
 		this.sprite = Game.game.add.sprite(data.x, data.y, data.car)
 		this.sprite._id = data._id
 		this.sprite.anchor.set(0.5)
@@ -62,6 +63,10 @@ class Player extends Entity {
 		//}
 	}
 
+	activeBullets() {
+		return this.weapon.bullets()
+	}
+
 	collideLayer (collisonLayer) {
 		game.physics.arcade.collide(this.sprite, collisonLayer)
 	}
@@ -75,15 +80,17 @@ class Player extends Entity {
 	}
 
 	hit () {
-		if(this.hearts) {
-			if(this.hearts.children.length <= 1) {
-				this.die()
-			}
-			this.removeHeart()
-			this.setImmun()
-		}else {
-			this.die()
-		}
+		// if(this.hearts) {
+		// 	if(this.hearts.children.length <= 1) {
+		// 		this.die()
+		// 	}
+		// 	this.removeHeart()
+		// 	this.setImmun()
+		// }
+		// else {
+		// 	this.die()
+		// }
+		this.die()
 	}
 
 	immunEffect () {
@@ -120,7 +127,7 @@ class Player extends Entity {
 		}
 		this.sprite.kill()
 		this.weapon.destroy()
-		this.dieEffect()
+	//	this.dieEffect()
 	}
 
 	addAmmunition () {
@@ -151,7 +158,7 @@ class Player extends Entity {
 	}
 
 	dieEffect () {  
-		emitter = Game.game.add.emitter(this.sprite.x, this.sprite.y, 6)
+		const emitter = Game.game.add.emitter(this.sprite.x, this.sprite.y, 6)
 		emitter.particleClass = this.explosionParticle
 		emitter.makeParticles('explosion')
 		emitter.width = 20

@@ -34,6 +34,10 @@ class Weapon {
 		this.weapon.fire()
 	}
 
+	bullets() {
+		return this.weapon.bullets
+	}
+
 	playSound() {
 		this.sound.play()
 	}

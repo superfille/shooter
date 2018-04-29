@@ -32,7 +32,7 @@ const playState = {
 		//this.ammunitionUpdate()
 		
 		const remotePlayers = Game.entityManager.getRemotePlayers()
-		const bullets = remotePlayers.map((player) => player.weapon.bullets)
+		const bullets = remotePlayers.map((player) => player.activeBullets())
 		if (bullets) {
 			Game.entityManager.client.isHit(bullets)
 		}
