@@ -10,14 +10,14 @@ class Player extends Entity {
 
 		this.name = data.name
 		this.type = data.type
-		this.sprite = Game.game.add.sprite(data.x, data.y, data.car)
+		this.sprite = PhaserGame.add.sprite(data.x, data.y, data.car)
 		this.sprite._id = data._id
 		this.sprite.anchor.set(0.5)
 		this.sprite.angle = data.angle
 		
 		this.isImmun = false
 
-		Game.game.physics.arcade.enable(this.sprite)
+		PhaserGame.physics.arcade.enable(this.sprite)
 		this.sprite.body.collideWorldBounds = true
 
 		this.hearts = Heart.initialize(3, this.hudX, this.hudY)
@@ -30,7 +30,7 @@ class Player extends Entity {
 	addHud (x, y) {
 		this.hudX = 32
 		this.hudY = 32
-		this.text = Game.game.add.text(this.hudX, this.hudY, this.name,
+		this.text = PhaserGame.add.text(this.hudX, this.hudY, this.name,
 			{
 				font: '22px Arial',
 				fill: '#000000',
@@ -68,12 +68,12 @@ class Player extends Entity {
 	}
 
 	collideLayer (collisonLayer) {
-		game.physics.arcade.collide(this.sprite, collisonLayer)
+		PhaserGame.physics.arcade.collide(this.sprite, collisonLayer)
 	}
 
 	isHit (enemyBullets) {
 		if(!this.isImmun) {
-			game.physics.arcade.overlap(this.sprite, enemyBullets, function() {
+			PhaserGame.physics.arcade.overlap(this.sprite, enemyBullets, function() {
 				this.hit()
 			}, null, this)
 		}
@@ -127,17 +127,19 @@ class Player extends Entity {
 		}
 		this.sprite.kill()
 		this.weapon.destroy()
+		Client.iDied()
 	//	this.dieEffect()
 	}
 
-	addAmmunition () {
-		if(this.coins.children.length < 3) {
-			this.addCoin()
-		}
+	addCarrot () {
+		// if(this.coins.children.length < 3) {
+		// 	this.addCoin()
+		// }
+		console.log("Got carrot")
 	}
 
 	addDieSound (sound) {
-		this.dieSound = game.add.audio(sound)
+		this.dieSound = PhaserGame.add.audio(sound)
 	}
 
 	isAlive () {
@@ -145,7 +147,7 @@ class Player extends Entity {
 	}
 
 	explosionParticle (x, y, key, frame) {  
-		Phaser.Particle.call(this, game, x, y, key, frame);
+		Phaser.Particle.call(this, PhaserGame, x, y, key, frame);
 	}
 	
 	initExplosionParticles () {
@@ -158,7 +160,7 @@ class Player extends Entity {
 	}
 
 	dieEffect () {  
-		const emitter = Game.game.add.emitter(this.sprite.x, this.sprite.y, 6)
+		const emitter = PhaserGame.add.emitter(this.sprite.x, this.sprite.y, 6)
 		emitter.particleClass = this.explosionParticle
 		emitter.makeParticles('explosion')
 		emitter.width = 20

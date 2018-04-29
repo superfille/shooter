@@ -4,10 +4,6 @@
     <meta charset="utf-8" />
     <title>My Page</title>
 
-    <script>
-        const Game = {}
-    </script>
-
     <script src="game/utils.js"></script>
     
     <script src="phaser.js"></script>
@@ -15,8 +11,7 @@
 
     <script src="game/components/entity.js"></script>
     <script src="game/components/entityManager.js"></script>
-    <script src="game/components/entityFactory.js"></script>
-    <script src="game/components/ammunition.js"></script>
+    <script src="game/components/carrotGroup.js"></script>
     <script src="game/components/coin.js"></script>
     <script src="game/components/heart.js"></script>
     <script src="game/components/weapon.js"></script>
@@ -32,6 +27,13 @@
     
     <script src="game/client.js"></script>
     <script src="game/game.js"></script>
+
+    <script>
+        const PhaserGame = new Phaser.Game(800, 800, Phaser.AUTO, '')
+        const Game = new MyGame()
+        const EntityManager = new MyEntityManager()        
+        const Client = new MyClient()
+    </script>
 </head>
 <body>
 </body>

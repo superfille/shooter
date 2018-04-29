@@ -4,7 +4,7 @@ class Weapon {
 		this.bulletSpeed = 500
 		this.audio = 'blaster'
 		this.sound = Game.addAudio(this.audio)
-		this.weapon = Game.addWeapon(this.maxBullets, sprite)
+		this.weapon = PhaserGame.add.weapon(this.maxBullets, sprite)
 
 		this.weapon.bulletKillType = Phaser.Weapon.KILL_NEVER
 		this.weapon.bulletCollideWorldBounds = true
@@ -17,11 +17,11 @@ class Weapon {
 	shoot() {
 		const bullet = this.weapon.fire()
 		if (bullet) {
-			bullet._id = Game.entityManager.getTempId()
+			bullet._id = EntityManager.getTempId()
 			let entity = new Entity({ _id: bullet._id, playerId: this.weapon.trackedSprite._id })
 			entity.sprite = bullet
-			entity.type = Game.entityManager.entityFactory.types.bullet
-			Game.entityManager.addTemp(entity)
+			entity.type = Utils.types.bullet
+			EntityManager.addTemp(entity)
 			Client.playerShoot(entity)
 		}
 		//this.playSound()
@@ -44,8 +44,8 @@ class Weapon {
 
 	getLivingBullets() {
 		const bullets = this.weapon.bullets.getAll('alive', true).map((bullet) => {
-			let state = Game.entityManager.serverState(bullet)
-			state.playerId = Game.entityManager.client._id
+			let state = EntityManager.serverState(bullet)
+			state.playerId = EntityManager.client._id
 			return state
 		})
 

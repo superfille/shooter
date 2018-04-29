@@ -99,10 +99,10 @@ class Entity {
 				this.sprite.angle = states[0].angle
 			}
 
-			const shortestAngle = Game.game.math.getShortestAngle(states[1].angle, this.sprite.angle)
+			const shortestAngle = PhaserGame.math.getShortestAngle(states[1].angle, this.sprite.angle)
 			const newAngle = this.sprite.angle - shortestAngle
 
-			this.tween = Game.game.add.tween(this.sprite)
+			this.tween = PhaserGame.add.tween(this.sprite)
 			this.tween.to({
 				x: states[1].x,
 				y: states[1].y,

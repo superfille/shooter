@@ -1,8 +1,7 @@
-class EntityManager {
-	constructor(data) {
+class MyEntityManager {
+	constructor() {
 		this.entities = []
 		this.tempEntities = []
-		this.entityFactory = new EntityFactory()
 		this.temporaryIds = 0
 	}
 
@@ -12,8 +11,10 @@ class EntityManager {
 	}
 
 	add(entity) {
-		if(!this.entities.find((ent) => ent._id === entity._id)) {
-			this.entities.push(entity)
+		if (!Utils.objectIsEmpty(entity)) {
+			if(!this.entities.find((ent) => ent._id === entity._id)) {
+				this.entities.push(entity)
+			}
 		}
 	}
 
@@ -44,10 +45,14 @@ class EntityManager {
 		}
 	}
 
-	createEntity(entity, isClient) {
-		const createdEntity = this.entityFactory.create(entity, isClient)
-		if (createdEntity) {
-			this.add(createdEntity)
+	addRemotePlayer(state) {
+		const player = new RemotePlayer(state)
+		this.add(player)
+	}
+
+	createEntity(entity) {
+		if (entity.types === Utils.types.player) {
+			this.addRemotePlayer(entity)	
 		}
 	}
 
@@ -69,13 +74,20 @@ class EntityManager {
 
 	getRemotePlayers() {
 		return this.entities.filter((entity) => {
-			return entity.type === this.entityFactory.types.player && entity._id !== this.client._id
+			return entity.type === Utils.types.player && entity._id !== this.client._id
 		})
 	}
 
 	addClient(entity) {
 		this.client = entity
 		this.add(entity)
+	}
+
+	addCarrot(carrot) {
+		if (!this.carrots) {
+			this.carrots = new CarrotGroup()
+		}
+		this.carrots.add(carrot)
 	}
 
 	addClientBall(ball) {
@@ -121,7 +133,7 @@ class EntityManager {
 			}
 
 			const entity = this.getEntity(state._id)
-			if (entity && this.client !== entity) {
+			if (!Utils.objectIsEmpty(entity) && this.client !== entity) {
 				entity.addToPositionBuffer(state)
 			}
 		}

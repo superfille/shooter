@@ -3,10 +3,10 @@ class ClientPlayer extends Player {
 		super(data)
 	
 		this.controlls = {
-			forward : Game.addKey(Phaser.KeyCode.W),
-			left    : Game.addKey(Phaser.KeyCode.A),
-			right   : Game.addKey(Phaser.KeyCode.D),
-			fire    : Game.addKey(Phaser.KeyCode.SPACEBAR)
+			forward : PhaserGame.input.keyboard.addKey(Phaser.KeyCode.W),
+			left    : PhaserGame.input.keyboard.addKey(Phaser.KeyCode.A),
+			right   : PhaserGame.input.keyboard.addKey(Phaser.KeyCode.D),
+			fire    : PhaserGame.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR)
 		}
 
 		this.startSendingUpdates()
@@ -53,7 +53,7 @@ class ClientPlayer extends Player {
 		
 		if (input.forward) {
 			this.sprite.body.angularVelocity = result
-			Game.game.physics.arcade.velocityFromAngle(this.sprite.angle, forwardVelocity, this.sprite.body.velocity)
+			PhaserGame.physics.arcade.velocityFromAngle(this.sprite.angle, forwardVelocity, this.sprite.body.velocity)
 			hasChanged = true
 		}
 		

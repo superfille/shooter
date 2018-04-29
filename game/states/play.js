@@ -1,24 +1,24 @@
 const playState = {
 	create() {
 		//this.initMusic()
-		Game.game.physics.startSystem(Phaser.Physics.ARCADE)
-		Game.game.stage.disableVisibilityChange = true
+		PhaserGame.physics.startSystem(Phaser.Physics.ARCADE)
+		PhaserGame.stage.disableVisibilityChange = true
 		this.createMap()
 		Client.askNewPlayer()
 	},
 
 	update() {
-		Game.entityManager.updateWorldState()
+		EntityManager.updateWorldState()
 
-		if (Game.entityManager.client == null) {
+		if (EntityManager.client == null) {
 			return  // Not connected yet.
 		}
 
 		 // Process inputs.
-		Game.entityManager.client.update()
+		EntityManager.client.update()
 
 		// Interpolate other entities.
-		Game.entityManager.interpolateEntities()
+		EntityManager.interpolateEntities()
 		
 
 		// if(clientPlayer === undefined) return
@@ -31,27 +31,24 @@ const playState = {
 
 		//this.ammunitionUpdate()
 		
-		const remotePlayers = Game.entityManager.getRemotePlayers()
+		const remotePlayers = EntityManager.getRemotePlayers()
 		const bullets = remotePlayers.map((player) => player.activeBullets())
 		if (bullets) {
-			Game.entityManager.client.isHit(bullets)
+			EntityManager.client.isHit(bullets)
 		}
-
+		if (EntityManager.carrots) {
+			EntityManager.carrots.overlap(EntityManager.client, EntityManager.client.addCarrot)
+		}
 		//clientPlayer.collideLayer(collisonLayer)
 		//remotePlayer.collideLayer(collisonLayer)
 	},
 
 	win() {
-		Game.startState('win')
-	},
-
-	ammunitionUpdate() {
-		Ammunition.overlap(clientPlayer, clientPlayer.addAmmunition)
-		//Ammunition.overlap(remotePlayer, remotePlayer.addAmmunition)
+		PhaserGame.state.start('win')
 	},
 
 	createMap() {
-		Game.map = Game.game.add.tilemap('tilemap');
+		Game.map = PhaserGame.add.tilemap('tilemap');
 		Game.map.addTilesetImage('tmw_desert_spacing', 'tile_atlas')
 	
 		// groundLayer = map.createLayer('Tile Layer 1')
@@ -65,7 +62,7 @@ const playState = {
 	
 	initMusic() {
 		if(Game.musicOn) {
-			Game.music = Game.game.add.audio('boden')
+			Game.music = PhaserGame.add.audio('boden')
 			Game.music.play()
 			Game.music.loop = true
 			Game.music.volume = 0.7

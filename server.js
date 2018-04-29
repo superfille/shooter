@@ -94,7 +94,7 @@ server._removeEntity = function(id) {
 }
 
 server._getAll = function(id) {
-	return server._entities.filter((entity) => entity._id !== id)
+	return server._entities.filter((entity) => entity.type === types.player && entity._id !== id)
 }
 
 server._applyInput = function(data) {
@@ -137,8 +137,34 @@ server._addBall = function(data) {
 	return entity
 }
 
-io.on('connection', function(socket) {
+server._startGame = function() {
+	if (!server._gameIsOn) {
+		server._gameIsOn = true
+		server.update_interval = setInterval(
+			() => server._addCarrot(),
+			8000
+		)
+	}
+}
 
+server._addCarrot = function() {
+	const newCarrot = {
+		id: server._getNewId(),
+		type: types.carrot,
+		x: randomInt(100, 500),
+		y: randomInt(100, 500),
+	}
+
+	server._addEntity(newCarrot)
+	const sockets = io.sockets.sockets
+	for (var id in sockets) {
+		const socket = sockets[id]
+		socket.emit('addCarrot', newCarrot)
+	}
+}
+
+io.on('connection', function(socket) {
+	server._startGame()
 	socket.on('newplayer', function() {
 		const id = server._getNewId()
 		const activePlayers = Object.keys(io.sockets.sockets).length
@@ -161,11 +187,13 @@ io.on('connection', function(socket) {
 
 		server._addEntity(player)
 		socket.emit('clientplayer', player)
-		socket.emit('allentities', server._getAll(player._id))
-		socket.broadcast.emit('newplayer', player)
-
-		//server.addState(socket.player)
-
+		const allPlayers = server._getAll(player._id)
+		console.log(allPlayers)
+		if (allPlayers.length > 0) {
+			socket.emit('allentities', allPlayers)
+			socket.broadcast.emit('newplayer', player)
+		}
+		
 		socket.on('disconnect', function() {
 			io.emit('remove', socket.playerId)
 			server._removeEntity(socket.playerId)
@@ -181,6 +209,10 @@ io.on('connection', function(socket) {
 			
 			ball.tempId = data.tempId
 			socket.emit('myNewBall', ball)
+		})
+
+		socket.on('iDied', function() {
+			
 		})
 	})
 })

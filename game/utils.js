@@ -9,3 +9,9 @@ Utils.getRandomInt = function(min, max) {
 Utils.objectIsEmpty = function (obj) {
 	return Object.keys(obj).length === 0 && obj.constructor === Object
 }
+
+Utils.types = {
+	player: 1,
+	bullet: 2,
+	carrot: 3
+}

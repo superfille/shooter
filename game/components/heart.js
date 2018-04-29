@@ -4,7 +4,7 @@ const Heart = {
 }
 
 Heart.initialize = function(numHearts, x, y) {
-	const hearts = Game.addGroup()
+	const hearts = PhaserGame.add.group()
 	hearts.initalX = x
 	hearts.initalY = y
 	
@@ -19,7 +19,7 @@ Heart.initialize = function(numHearts, x, y) {
 
 Heart.add = function(hearts) {
 	hearts.add(
-		Game.addSprite(
+		PhaserGame.add.sprite(
 			hearts.initalX + (hearts.children.length * this.gap),
 			hearts.initalY,
 			this.sprite

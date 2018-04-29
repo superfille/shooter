@@ -6,7 +6,7 @@ const Coin = {
 }
 
 Coin.initialize = function(numCoins, x, y) {
-	const coins = Game.addGroup()
+	const coins = PhaserGame.add.group()
 	coins.initX = x
 	coins.initY = y
 
