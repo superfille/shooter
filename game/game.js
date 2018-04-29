@@ -63,6 +63,14 @@ Game.addAudio = function (audio) {
 	}
 }
 
+Game.addClientBall = function(ball) {
+	this.entityManager.addClientBall(ball)
+}
+
+Game.addRemoteBall = function(ball) {
+	this.entityManager.addRemoteBall(ball)
+}
+
 Game.addSprite = function(x, y, sprite) {
 	return this.game.add.sprite(x, y, sprite)
 }

@@ -119,6 +119,7 @@ class Player extends Entity {
 			this.dieSound.play()
 		}
 		this.sprite.kill()
+		this.weapon.destroy()
 		this.dieEffect()
 	}
 

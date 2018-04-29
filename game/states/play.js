@@ -30,15 +30,12 @@ const playState = {
 		// }
 
 		//this.ammunitionUpdate()
-		//Game.players.forEach((player) => {
-		//	player.update()
-			//player.isHit(remotePlayer.weapon.bullets)
-		//})
-		//clientPlayer.update()
-		//remotePlayer.update()
-	
-		//clientPlayer.isHit(remotePlayer.weapon.bullets)
-		//remotePlayer.isHit(player1.weapon.bullets)
+		
+		const remotePlayers = Game.entityManager.getRemotePlayers()
+		const bullets = remotePlayers.map((player) => player.weapon.bullets)
+		if (bullets) {
+			Game.entityManager.client.isHit(bullets)
+		}
 
 		//clientPlayer.collideLayer(collisonLayer)
 		//remotePlayer.collideLayer(collisonLayer)

@@ -1,6 +1,7 @@
 class EntityManager {
 	constructor(data) {
 		this.entities = []
+		this.tempEntities = []
 		this.entityFactory = new EntityFactory()
 		this.temporaryIds = 0
 	}
@@ -13,6 +14,33 @@ class EntityManager {
 	add(entity) {
 		if(!this.entities.find((ent) => ent._id === entity._id)) {
 			this.entities.push(entity)
+		}
+	}
+
+	addTemp(entity) {
+		if(!this.tempEntities.find((ent) => ent._id === entity._id)) {
+			this.tempEntities.push(entity)
+		}
+	}
+
+	addRemoteBall(ball) {
+		const player = this.getEntity(ball.playerId)
+		if (player) {
+			player.weapon.remoteShoot(ball)
+		}
+		else {
+			console.error("Shooting ball could not find player", ball)
+		}
+		
+	}
+
+	updateTempToNormal(entity) {
+		const index = this.tempEntities.findIndex((ent) => ent._id === entity.tempId)
+		if (index >= 0) {
+			const tempEntity = this.tempEntities[index]
+			tempEntity._id = entity._id	
+			this.add(tempEntity)
+			this.tempEntities.splice(index, 1)
 		}
 	}
 
@@ -39,9 +67,19 @@ class EntityManager {
 		return this.entities.find((entity) => entity._id === id)
 	}
 
+	getRemotePlayers() {
+		return this.entities.filter((entity) => {
+			return entity.type === this.entityFactory.types.player && entity._id !== Game.client._id
+		})
+	}
+
 	addClient(entity) {
 		this.client = entity
 		this.add(entity)
+	}
+
+	addClientBall(ball) {
+		this.updateTempToNormal(ball)
 	}
 
 	remove(id) {

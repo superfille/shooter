@@ -97,10 +97,6 @@ server._getAll = function(id) {
 	return server._entities.filter((entity) => entity._id !== id)
 }
 
-server._addedEntity = function(playerId, entity) {
-	server._sendMsgToPlayer(playerId, entity, 'entityadded')
-}
-
 server._applyInput = function(data) {
 	if (!Array.isArray(data)) {
 		data = [data]
@@ -127,6 +123,20 @@ server._getNewId = function() {
 	return server._ids += 1
 }
 
+server._addBall = function(data) {
+	const newId = server._getNewId()
+	const entity = {
+		_id: newId,
+		playerId: data.playerId,
+		x: data.x,
+		y: data.y,
+		angle: data.angle,
+	}
+	server._addEntity(entity)
+
+	return entity
+}
+
 io.on('connection', function(socket) {
 
 	socket.on('newplayer', function() {
@@ -141,7 +151,7 @@ io.on('connection', function(socket) {
 		}
 
 		socket.playerId = id
-		if (activePlayers === 0) {
+		if (activePlayers === 1) {
 			player.car = 'car_yellow'
 			player.ball = 'yellow_ball'
 		} else {
@@ -163,6 +173,14 @@ io.on('connection', function(socket) {
 		
 		socket.on('move', function(data) {
 			server._processInputs(data)
+		})
+
+		socket.on('shoot', function(data) {
+			const ball = server._addBall(data)
+			socket.broadcast.emit('newBall', ball)
+			
+			ball.tempId = data.tempId
+			socket.emit('myNewBall', ball)
 		})
 	})
 })

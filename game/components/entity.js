@@ -56,9 +56,6 @@ class Entity {
 				0: this.getState(this.positionBuffer[3]),
 				1: this.getState(this.positionBuffer[this.positionBuffer.length - 1])
 			}
-			// const temp = this.positionBuffer[this.positionBuffer.length - 1]
-			// this.positionBuffer.length = 0
-			// this.positionBuffer.push(temp)
 			this.dropOlderBufferPositions(4)
 		}
 

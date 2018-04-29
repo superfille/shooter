@@ -27,6 +27,25 @@ Client.sendState = function(states) {
 	Client.socket.emit('move', sendReady)
 }
 
+Client.playerShoot = function(ball) {
+	const newBall = {
+		playerId: Game.entityManager.client._id,
+		tempId: ball._id,
+		x: ball.sprite.x,
+		y: ball.sprite.y,
+		angle: ball.sprite.angle
+	}
+	Client.socket.emit('shoot', newBall)
+}
+
+Client.socket.on('myNewBall', function(ball) {
+	Game.addClientBall(ball)
+})
+
+Client.socket.on('newBall', function(ball) {
+	Game.addRemoteBall(ball)
+})
+
 Client.socket.on('updatestate', function(worldState) {
 	Game.updateWorldState(worldState)
 })
@@ -55,8 +74,4 @@ Client.socket.on('remove', function(id) {
 
 Client.socket.on('addAmmo', function() {
 	Game.addAmmo()
-})
-
-Client.socket.on('entityadded', function(data) {
-	Game.entityManager.cleanEntityId(data)
 })

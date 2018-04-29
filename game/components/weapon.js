@@ -1,6 +1,5 @@
 class Weapon {
 	constructor (player, sprite) {
-		this.bulletIds = 0
 		this.maxBullets = 50
 		this.bulletSpeed = 500
 		this.audio = 'blaster'
@@ -19,12 +18,20 @@ class Weapon {
 		const bullet = this.weapon.fire()
 		if (bullet) {
 			bullet._id = Game.entityManager.getTempId()
-			let entity = new Entity({ _id: bullet._id })
+			let entity = new Entity({ _id: bullet._id, playerId: this.weapon.trackedSprite._id })
 			entity.sprite = bullet
 			entity.type = Game.entityManager.entityFactory.types.bullet
-			Game.entityManager.add(entity)
+			Game.entityManager.addTemp(entity)
+			Client.playerShoot(entity)
 		}
 		//this.playSound()
+	}
+
+	remoteShoot(ball) {
+		this.weapon.fireFrom.x = ball.x
+		this.weapon.fireFrom.y = ball.y
+		this.weapon.fireAngle = ball.angle
+		this.weapon.fire()
 	}
 
 	playSound() {
@@ -39,5 +46,9 @@ class Weapon {
 		})
 
 		return bullets
+	}
+
+	destroy() {
+		this.weapon.killAll()
 	}
 }

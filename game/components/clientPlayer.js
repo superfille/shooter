@@ -13,7 +13,7 @@ class ClientPlayer extends Player {
 	}
 
 	startSendingUpdates() {
-		// TODO: Flytta till client.js istællet och hæmta alla entities
+		// TODO: Flytta till client.js istællet och hämta alla entities
 		this.sendingStates = setInterval(() => {
 			// Send this clients player and bullet states
 			const state = this.getCurrentState()
@@ -58,7 +58,7 @@ class ClientPlayer extends Player {
 		}
 		
 		if (input.fire) {
-			//this.shoot()
+			this.shoot()
 		}
 
 		return hasChanged
