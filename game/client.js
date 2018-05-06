@@ -31,12 +31,18 @@ class MyClient {
 	}
 
 	playerShoot(ball) {
+		console.log(ball.sprite.body.velocity)
 		const newBall = {
 			playerId: EntityManager.client._id,
 			tempId: ball._id,
 			x: ball.sprite.x,
 			y: ball.sprite.y,
-			angle: ball.sprite.angle
+			velocity: {
+				x: ball.sprite.body.velocity.x,
+				y: ball.sprite.body.velocity.y
+			},
+			angle: ball.sprite.angle,
+			radians: Phaser.Math.degToRad(ball.sprite.angle)
 		}
 		this.socket.emit('shoot', newBall)
 	}

@@ -6,6 +6,7 @@ var express = require('express');
 var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io').listen(server);
+var engine = require('./server/engine')
 // Request logging
 app.use(function(req, res, next) {
     next();
@@ -31,8 +32,12 @@ server._entities = []
 server._ids = 0
 
 server._setUpdate = function() {
+	server._prevTime = +new Date()
 	server.update_interval = setInterval(
-		() => server._update(),
+		() => {
+			server._renderUpdate()
+			server._update()
+		},
 		1000 / server._updateRate
 	)
 }()
@@ -46,6 +51,18 @@ server._update = function() {
 		const socket = sockets[id]
 		socket.emit('updatestate', worldState)
 	}
+}
+
+server._renderUpdate = function() {
+	const now = +new Date()
+	const delta = now - server._prevTime
+	server._prevTime = now
+	server._entities.forEach(entity => {
+		if (entity.type === types.ball) {
+			entity.timestamp = now
+			engine.updateBall(delta, entity)
+		}
+	})
 }
 
 server._getCleanWorldState = function() {
@@ -94,7 +111,7 @@ server._removeEntity = function(id) {
 }
 
 server._getAll = function(id) {
-	return server._entities.filter((entity) => entity.type === types.player && entity._id !== id)
+	return server._entities.filter((entity) => entity._id !== id)
 }
 
 server._applyInput = function(data) {
@@ -131,20 +148,27 @@ server._addBall = function(data) {
 		x: data.x,
 		y: data.y,
 		angle: data.angle,
+		radians: data.radians,
+		velocity: {
+			x: data.velocity.x,
+			y: data.velocity.y
+		}
 	}
+	engine.setToPolar(entity)
 	server._addEntity(entity)
 
 	return entity
 }
 
 server._startGame = function() {
-	if (!server._gameIsOn) {
-		server._gameIsOn = true
-		server.update_interval = setInterval(
-			() => server._addCarrot(),
-			8000
-		)
-	}
+	return
+	// if (!server._gameIsOn) {
+	// 	server._gameIsOn = true
+	// 	server.update_interval = setInterval(
+	// 		() => server._addCarrot(),
+	// 		8000
+	// 	)
+	// }
 }
 
 server._addCarrot = function() {
@@ -177,7 +201,8 @@ io.on('connection', function(socket) {
 		}
 
 		socket.playerId = id
-		if (activePlayers === 1) {
+		console.log(activePlayers)
+		if (activePlayers <= 1) {
 			player.car = 'car_yellow'
 			player.ball = 'yellow_ball'
 		} else {
@@ -187,10 +212,9 @@ io.on('connection', function(socket) {
 
 		server._addEntity(player)
 		socket.emit('clientplayer', player)
-		const allPlayers = server._getAll(player._id)
-		console.log(allPlayers)
-		if (allPlayers.length > 0) {
-			socket.emit('allentities', allPlayers)
+		const eveything = server._getAll(player._id)
+		if (eveything.length > 0) {
+			socket.emit('allentities', eveything)
 			socket.broadcast.emit('newplayer', player)
 		}
 		
