@@ -1,7 +1,7 @@
 class Weapon {
 	constructor (player, sprite) {
 		this.maxBullets = 50
-		this.bulletSpeed = 0//500
+		this.bulletSpeed = 400
 		this.audio = 'blaster'
 		this.sound = Game.addAudio(this.audio)
 		this.weapon = PhaserGame.add.weapon(this.maxBullets, sprite)
@@ -12,6 +12,7 @@ class Weapon {
 		this.weapon.bullets.setAll('body.bounce.x', 1)
 		this.weapon.bullets.setAll('body.bounce.y', 1)
 		this.weapon.trackSprite(player, 0, 0, true)
+		this.weapon.fireRate = 0
 	}
 
 	shoot() {
@@ -32,9 +33,14 @@ class Weapon {
 		this.weapon.fireFrom.y = ball.y
 		this.weapon.fireAngle = ball.angle
 		const ballSprite = this.weapon.fire()
+		if (!ballSprite) {
+			console.error("Failed to shoot ball ", this)
+			return null
+		}
 		const entity = new Entity({ _id: ball._id })
 		entity.x = ball.x
 		entity.y = ball.y
+		entity.type = Utils.types.ball
 		entity.angle = ball.angle
 		entity.sprite = ballSprite
 		entity.velocity = { x: ball.velocity.x, y: ball.velocity.y }

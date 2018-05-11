@@ -98,7 +98,9 @@ class Entity {
 				this.sprite.y = states[0].y
 				this.sprite.angle = states[0].angle
 			}
-
+			if(!this.sprite) {
+				console.error(this)
+			}
 			const shortestAngle = PhaserGame.math.getShortestAngle(states[1].angle, this.sprite.angle)
 			const newAngle = this.sprite.angle - shortestAngle
 

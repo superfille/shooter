@@ -7,9 +7,16 @@
     "express": "^4.16.2",
     "socket.io": "^2.0.4"
   },
+  "devDependencies": {
+    "jshint": "^0.0.1"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/superfille/shooter.git"
+  },
+  "jshintConfig": {
+    "esversion": 6,
+    "asi": true
   },
   "author": "Filip Anic",
   "license": "MIT",

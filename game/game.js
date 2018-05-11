@@ -20,7 +20,7 @@ class MyGame {
 
 	removePlayer(id) {
 		if (!this.clientActive) return
-		EntityManager.remove(id)
+		EntityManager.removePlayer(id)
 	}
 
 	updateWorldState(worldState) {

@@ -31,7 +31,6 @@ class MyClient {
 	}
 
 	playerShoot(ball) {
-		console.log(ball.sprite.body.velocity)
 		const newBall = {
 			playerId: EntityManager.client._id,
 			tempId: ball._id,
@@ -80,14 +79,26 @@ class MyClient {
 
 		this.socket.on('allentities', function(data) {
 			if (data) {
-				data.forEach(element => {
-					EntityManager.createEntity(element)
-				});
+				data.forEach(entity => {
+					if (entity.type === Utils.types.player) {
+						EntityManager.createEntity(entity)
+					}
+				})
+
+				data.forEach(entity => {
+					if (entity.type !== Utils.types.player) {
+						EntityManager.createEntity(entity)
+					}
+				})
 			}
 		})
 
-		this.socket.on('remove', function(id) {
-			Game.removePlayer(id)
+		this.socket.on('playerdied', function(playerId) {
+			Game.removePlayer(playerId)
+		})
+
+		this.socket.on('remove', function(playerId) {
+			Game.removePlayer(playerId)
 		})
 	}
 }

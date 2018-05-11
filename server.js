@@ -1,5 +1,5 @@
 var sitePath = process.argv[2] || ".";
-var port = 3000;
+var port = 8081;
  
 // Libraries
 var express = require('express');
@@ -17,7 +17,7 @@ console.log(sitePath);
 console.log("Starting server in: " + __dirname + '/' + sitePath);
 app.use(express.static(__dirname + '/' + sitePath));
 
-server.listen(8081, '0.0.0.0', function() {
+server.listen(port, '0.0.0.0', function() {
 	console.log("Listening on " + server.address().port)
 })
 
@@ -69,6 +69,7 @@ server._getCleanWorldState = function() {
 	return server._entities.map((entity) => {
 		return {
 			_id: entity._id,
+			playerId: entity.playerId,
 			type: entity.type,
 			x: entity.x,
 			y: entity.y,
@@ -76,21 +77,6 @@ server._getCleanWorldState = function() {
 			timestamp: entity.timestamp
 		}
 	})
-}
-
-server._sendMsgToPlayer = function(id, msg, action) {
-	const sockets = io.sockets.sockets
-	for (var index in sockets) {
-		const socket = sockets[index]
-		if (socket.playerId === id) {
-			socket.emit(action, msg)
-			return
-		}
-	}
-}
-
-server._validateInput = function(input) {
-	return true
 }
 
 server._getEntity = function(id) {
@@ -107,6 +93,17 @@ server._removeEntity = function(id) {
 	let position = -1
 	if((position = server._entities.findIndex((entity) => entity._id === id)) >= 0) {
 		server._entities.splice(position, 1)
+	}
+}
+
+server._removePlayer = function(id) {
+	console.log("Removing player ", id)
+	for (let index = 0; index < server._entities.length; index++) {
+		const entity = server._entities[index]
+		if (entity._id === id || entity.playerId === id) {
+			server._entities.splice(index, 1)
+			index -= 1
+		}
 	}
 }
 
@@ -131,9 +128,7 @@ server._applyInput = function(data) {
 }
 
 server._processInputs = function(state) {
-	if (server._validateInput(state)) {
-		server._applyInput(state)
-	}
+	server._applyInput(state)
 }
 
 server._getNewId = function() {
@@ -144,6 +139,7 @@ server._addBall = function(data) {
 	const newId = server._getNewId()
 	const entity = {
 		_id: newId,
+		type: types.ball,
 		playerId: data.playerId,
 		x: data.x,
 		y: data.y,
@@ -201,7 +197,6 @@ io.on('connection', function(socket) {
 		}
 
 		socket.playerId = id
-		console.log(activePlayers)
 		if (activePlayers <= 1) {
 			player.car = 'car_yellow'
 			player.ball = 'yellow_ball'
@@ -220,7 +215,7 @@ io.on('connection', function(socket) {
 		
 		socket.on('disconnect', function() {
 			io.emit('remove', socket.playerId)
-			server._removeEntity(socket.playerId)
+			server._removePlayer(socket.playerId)
 		})
 		
 		socket.on('move', function(data) {
@@ -236,7 +231,8 @@ io.on('connection', function(socket) {
 		})
 
 		socket.on('iDied', function() {
-			
+			server._removePlayer(socket.playerId)
+			socket.broadcast.emit('playerdied', socket.playerId)
 		})
 	})
 })

@@ -27,10 +27,12 @@ class MyEntityManager {
 	addRemoteBall(ball) {
 		const remotePlayer = this.getEntity(ball.playerId)
 		if (!remotePlayer) {
-			return console.error("Could not find remote palyer")
+			return console.error("Could not find remote player ", ball)
 		}
 		const newBallEntity = remotePlayer.weapon.remoteShoot(ball)
-		this.add(newBallEntity)
+		if (newBallEntity) {
+			this.add(newBallEntity)
+		}
 	}
 
 	updateTempToNormal(entity) {
@@ -51,8 +53,15 @@ class MyEntityManager {
 	createEntity(entity) {
 		if (entity.type === Utils.types.player) {
 			this.addRemotePlayer(entity)	
-		} else {
-			this.add(entity)
+		}
+		else if (entity.type === Utils.types.ball) {
+			this.addRemoteBall(entity)
+		}
+		else if (entity.type === Utils.types.carrot) {
+
+		}
+		else {
+			console.error("create entity error", entity)
 		}
 	}
 
@@ -101,6 +110,22 @@ class MyEntityManager {
 			const entity = this.entities[position]
 			this.entities.splice(position, 1)
 			entity.remove()
+		}
+	}
+
+	// Remove all balls also
+	removePlayer(playerId) {
+		for (let index = 0; index < this.entities.length; index++) {
+			const entity = this.entities[index]
+			if (entity._id === playerId) {
+				entity.weapon.destroy()
+				entity.sprite.kill()
+				this.entities.splice(index, 1)
+				index -= 1
+			} else if (entity.playerId === playerId) {
+				this.entities.splice(index, 1)
+				index -= 1
+			}
 		}
 	}
 
