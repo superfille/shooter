@@ -8,7 +8,7 @@
     "socket.io": "^2.0.4"
   },
   "devDependencies": {
-    "jshint": "^0.0.1"
+    "jshint": "latest"
   },
   "repository": {
     "type": "git",
