@@ -40,11 +40,9 @@ class Player extends Entity {
 	}
 	
 	addCoin () {
-		//Coin.add(this.coins)
-	}
-
-	removeCoins () {
-		Coin.removeAll(this.coins)
+		if (this.coins.numberOfCoins() < 3) {
+			this.coins.add()
+		}
 	}
 
 	addHeart () {
@@ -56,11 +54,10 @@ class Player extends Entity {
 	}
 
 	shoot () {
-		//if(this.coins.children.length === coinsToShoot) {
-		//if(true) { // Fire whenever
-			//this.removeCoins()
-		this.weapon.shoot()
-		//}
+		if(this.coins.numberOfCoins() === coinsToShoot) {
+			this.coins.clear()
+			this.weapon.shoot()
+		}
 	}
 
 	activeBullets() {
@@ -129,13 +126,6 @@ class Player extends Entity {
 		this.weapon.destroy()
 		Client.iDied()
 	//	this.dieEffect()
-	}
-
-	addCarrot () {
-		if(this.coins.coins.children.length < 3) {
-			this.addCoin()
-		}
-		console.log("Got carrot")
 	}
 
 	addDieSound (sound) {

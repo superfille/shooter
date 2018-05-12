@@ -11,20 +11,24 @@ class Coin {
 	}
 
 	add() {
-		const coin = game.add.sprite(
+		const coin = PhaserGame.add.sprite(
 			this.coins.x + (this.gap * this.coins.children.length),
 			this.coins.y,
 			this.sprite
 		)
 
-		this.coin.animations.add(this.animation)
-		this.coin.animations.play(this.animation, 12, true)
+		coin.animations.add(this.animation)
+		coin.animations.play(this.animation, 12, true)
 		this.coins.add(coin)
 		
-		this.playSound()
+		//this.playSound()
 	}
 
-	removeAll(coins) {
+	numberOfCoins() {
+		return this.coins.children.length
+	}
+
+	clear() {
 		this.coins.removeAll()
 	}
 

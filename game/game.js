@@ -54,7 +54,7 @@ class MyGame {
 	}
 
 	gotCarrot(carrot) {
-		EntityManager.addPlayerCarrot(carrot)
+		EntityManager.addPlayerCoin(carrot)
 	}
 
 	addClientBall(ball) {

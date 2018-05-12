@@ -58,7 +58,7 @@ class MyEntityManager {
 			this.addRemoteBall(entity)
 		}
 		else if (entity.type === Utils.types.carrot) {
-
+			this.addCarrot(entity)
 		}
 		else {
 			console.error("create entity error", entity)
@@ -100,11 +100,11 @@ class MyEntityManager {
 		this.carrots.add(carrot)
 	}
 
-	addPlayerCarrot(carrot) {
+	addPlayerCoin(carrot) {
 		const player = this.getEntity(carrot.playerId)
 		const carrotEntity = this.getEntity(carrot.id)
 
-		player.addCarrot()
+		player.addCoin()
 		this.carrots.remove(carrot.id)
 	}
 
