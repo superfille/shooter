@@ -16,7 +16,9 @@
   },
   "jshintConfig": {
     "esversion": 6,
-    "asi": true
+    "asi": true,
+    "eqeqeq": true,
+    "plusplus": true
   },
   "author": "Filip Anic",
   "license": "MIT",

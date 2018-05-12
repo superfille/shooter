@@ -10,7 +10,7 @@ const playState = {
 	update() {
 		EntityManager.updateWorldState()
 
-		if (EntityManager.client == null) {
+		if (EntityManager.client === undefined || EntityManager.client === null) {
 			return  // Not connected yet.
 		}
 
@@ -37,7 +37,7 @@ const playState = {
 			EntityManager.client.isHit(bullets)
 		}
 		if (EntityManager.carrots) {
-			EntityManager.carrots.overlap(EntityManager.client, EntityManager.client.addCarrot)
+			EntityManager.carrots.overlap(EntityManager.client.sprite, EntityManager.client.tookCarrot)
 		}
 		//clientPlayer.collideLayer(collisonLayer)
 		//remotePlayer.collideLayer(collisonLayer)

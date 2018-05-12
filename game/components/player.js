@@ -21,15 +21,15 @@ class Player extends Entity {
 		this.sprite.body.collideWorldBounds = true
 
 		this.hearts = Heart.initialize(3, this.hudX, this.hudY)
-		this.coins = Coin.initialize(0, this.hudX, this.hudY)
+		this.coins = new Coin(0, this.hudX, this.hudY)
 		this.weapon = new Weapon(this.sprite, data.ball)
 
 		this.initExplosionParticles()
 	}
 
 	addHud (x, y) {
-		this.hudX = 32
-		this.hudY = 32
+		this.hudX = x
+		this.hudY = y
 		this.text = PhaserGame.add.text(this.hudX, this.hudY, this.name,
 			{
 				font: '22px Arial',
@@ -40,7 +40,7 @@ class Player extends Entity {
 	}
 	
 	addCoin () {
-		Coin.add(this.coins)
+		//Coin.add(this.coins)
 	}
 
 	removeCoins () {
@@ -132,9 +132,9 @@ class Player extends Entity {
 	}
 
 	addCarrot () {
-		// if(this.coins.children.length < 3) {
-		// 	this.addCoin()
-		// }
+		if(this.coins.coins.children.length < 3) {
+			this.addCoin()
+		}
 		console.log("Got carrot")
 	}
 

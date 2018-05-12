@@ -53,6 +53,10 @@ class MyGame {
 		EntityManager.addCarrot(carrot)
 	}
 
+	gotCarrot(carrot) {
+		EntityManager.addPlayerCarrot(carrot)
+	}
+
 	addClientBall(ball) {
 		if (!this.clientActive) return
 		EntityManager.addClientBall(ball)

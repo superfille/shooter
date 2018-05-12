@@ -157,22 +157,21 @@ server._addBall = function(data) {
 }
 
 server._startGame = function() {
-	return
-	// if (!server._gameIsOn) {
-	// 	server._gameIsOn = true
-	// 	server.update_interval = setInterval(
-	// 		() => server._addCarrot(),
-	// 		8000
-	// 	)
-	// }
+	if (!server._gameIsOn) {
+		server._gameIsOn = true
+		server.update_interval = setInterval(
+			() => server._addCarrot(),
+			8000
+		)
+	}
 }
 
 server._addCarrot = function() {
 	const newCarrot = {
-		id: server._getNewId(),
+		_id: server._getNewId(),
 		type: types.carrot,
-		x: randomInt(100, 500),
-		y: randomInt(100, 500),
+		x: randomInt(100, 700),
+		y: randomInt(100, 700),
 	}
 
 	server._addEntity(newCarrot)
@@ -181,6 +180,11 @@ server._addCarrot = function() {
 		const socket = sockets[id]
 		socket.emit('addCarrot', newCarrot)
 	}
+}
+
+server._validateTookCarrot = function(playerId, id) {
+	server._removeEntity(id)
+	return true
 }
 
 io.on('connection', function(socket) {
@@ -228,6 +232,13 @@ io.on('connection', function(socket) {
 			
 			ball.tempId = data.tempId
 			socket.emit('myNewBall', ball)
+		})
+		
+		socket.on('tookCarrot', function(id) {
+			if (server._validateTookCarrot(socket.playerId, id)) {
+				socket.emit('tookCarrot', {playerId: socket.playerId, id: id})
+				socket.broadcast.emit('tookCarrot', {playerId: socket.playerId, id: id})
+			}
 		})
 
 		socket.on('iDied', function() {

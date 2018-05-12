@@ -13,7 +13,8 @@ class CarrotGroup {
 	}
 
 	add(entity) {
-		this.carrots.create(entity.x, entity.y, this.sprite)
+		const carrot = this.carrots.create(entity.x, entity.y, this.sprite)
+		carrot._id = entity._id
 		//this.playSound(this.audio.spawn)
 	}
 
@@ -23,9 +24,19 @@ class CarrotGroup {
 
 	overlap(obj, cb) {
 		PhaserGame.physics.arcade.overlap(obj, this.carrots, (_, carrot) => {
-			carrot.kill()
-			cb()
+			const id = carrot._id
+			cb(id)
 		}, null, obj)
+	}
+
+	remove(id) {
+		for (let index = 0; index < this.carrots.children.length; index += 1) {
+			const carrot = this.carrots.children[index];
+			if (carrot._id === id) {
+				carrot.kill()
+				break
+			}
+		}
 	}
 
 }

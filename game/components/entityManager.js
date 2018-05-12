@@ -100,6 +100,14 @@ class MyEntityManager {
 		this.carrots.add(carrot)
 	}
 
+	addPlayerCarrot(carrot) {
+		const player = this.getEntity(carrot.playerId)
+		const carrotEntity = this.getEntity(carrot.id)
+
+		player.addCarrot()
+		this.carrots.remove(carrot.id)
+	}
+
 	addClientBall(ball) {
 		this.updateTempToNormal(ball)
 	}
@@ -115,7 +123,7 @@ class MyEntityManager {
 
 	// Remove all balls also
 	removePlayer(playerId) {
-		for (let index = 0; index < this.entities.length; index++) {
+		for (let index = 0; index < this.entities.length; index +=1) {
 			const entity = this.entities[index]
 			if (entity._id === playerId) {
 				entity.weapon.destroy()
@@ -150,7 +158,7 @@ class MyEntityManager {
 			return
 		}
 		// World state is a list of entity states.
-		for (let i = 0; i < entities.length; i++) {
+		for (let i = 0; i < entities.length; i += 1) {
 			const state = entities[i]
 			
 			// This entity does not exist

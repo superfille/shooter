@@ -46,6 +46,10 @@ class MyClient {
 		this.socket.emit('shoot', newBall)
 	}
 
+	tookCarrot(id) {
+		this.socket.emit('tookCarrot', id)
+	}
+
 	iDied() {
 		this.socket.emit('iDied')
 	}
@@ -53,6 +57,10 @@ class MyClient {
 	initSocket() {
 		this.socket.on('addCarrot', function(carrot) {
 			Game.addCarrot(carrot)
+		})
+
+		this.socket.on('tookCarrot', function(data) {
+			Game.gotCarrot(data)
 		})
 
 		this.socket.on('myNewBall', function(ball) {

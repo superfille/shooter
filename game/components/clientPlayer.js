@@ -12,6 +12,11 @@ class ClientPlayer extends Player {
 		this.startSendingUpdates()
 	}
 
+	tookCarrot(id) {
+		console.log(id)
+		Client.tookCarrot(id)
+	}
+
 	startSendingUpdates() {
 		// TODO: Flytta till client.js istællet och hämta alla entities
 		this.sendingStates = setInterval(() => {
@@ -38,7 +43,7 @@ class ClientPlayer extends Player {
 			fire: 		this.controlls.fire.isDown
 		}
 		
-		const hasChanged = this.applyInput(input)
+		this.applyInput(input)
 	}
 
 	applyInput (input) {
