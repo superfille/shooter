@@ -2,8 +2,7 @@ class Weapon {
 	constructor (player, sprite) {
 		this.maxBullets = 50
 		this.bulletSpeed = 400
-		this.audio = 'blaster'
-		this.sound = Game.addAudio(this.audio)
+		this.sound = PhaserGame.add.audio('blaster')
 		this.weapon = PhaserGame.add.weapon(this.maxBullets, sprite)
 
 		this.weapon.bulletKillType = Phaser.Weapon.KILL_NEVER
@@ -24,8 +23,8 @@ class Weapon {
 			entity.type = Utils.types.bullet
 			EntityManager.addTemp(entity)
 			Client.playerShoot(entity)
+			this.sound.play()
 		}
-		//this.playSound()
 	}
 
 	remoteShoot(ball) {
@@ -51,10 +50,6 @@ class Weapon {
 
 	bullets() {
 		return this.weapon.bullets
-	}
-
-	playSound() {
-		this.sound.play()
 	}
 
 	destroy() {

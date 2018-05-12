@@ -3,7 +3,6 @@ class Coin {
 		this.sprite ='coin'
 		this.animation = 'walk'
 		this.gap = 32
-		this.audio = 'temp' //TODO: Add audio
 
 		this.coins = PhaserGame.add.group()
 		this.coins.x = x
@@ -20,8 +19,6 @@ class Coin {
 		coin.animations.add(this.animation)
 		coin.animations.play(this.animation, 12, true)
 		this.coins.add(coin)
-		
-		//this.playSound()
 	}
 
 	numberOfCoins() {
@@ -30,13 +27,5 @@ class Coin {
 
 	clear() {
 		this.coins.removeAll()
-	}
-
-	playSound() {
-		// if (!this.sound) {
-		// 	this.sound = Game.addAudio(this.audio)
-		// }
-
-		// this.sound.play()
 	}
 }

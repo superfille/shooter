@@ -30,6 +30,7 @@ const types = {
 server._updateRate = 30
 server._entities = []
 server._ids = 0
+server._useCarrots = true
 
 server._setUpdate = function() {
 	server._prevTime = +new Date()
@@ -97,8 +98,7 @@ server._removeEntity = function(id) {
 }
 
 server._removePlayer = function(id) {
-	console.log("Removing player ", id)
-	for (let index = 0; index < server._entities.length; index++) {
+	for (let index = 0; index < server._entities.length; index += 1) {
 		const entity = server._entities[index]
 		if (entity._id === id || entity.playerId === id) {
 			server._entities.splice(index, 1)
@@ -156,13 +156,15 @@ server._addBall = function(data) {
 	return entity
 }
 
-server._startGame = function() {
-	if (!server._gameIsOn) {
-		server._gameIsOn = true
-		server.update_interval = setInterval(
-			() => server._addCarrot(),
-			8000
-		)
+server._initCarrots = function() {
+	if (server._useCarrots) {
+		if (!server._gameIsOn) {
+			server._gameIsOn = true
+			server.update_interval = setInterval(
+				() => server._addCarrot(),
+				8000
+			)
+		}
 	}
 }
 
@@ -187,26 +189,37 @@ server._validateTookCarrot = function(playerId, id) {
 	return true
 }
 
+server._garage = [
+	'blue', 'purple', 'yellow', 'green', 'aqua', 'red'
+]
+server._inStreet = []
+server._getCar = function() {
+	let car = server._garage.shift()
+	if (!car) {
+		car = 'red'
+	}
+
+	return car
+}
+
+server._returnCar = function(car) {
+	server._garage.push(car)
+}
+
 io.on('connection', function(socket) {
-	server._startGame()
+	server._initCarrots()
 	socket.on('newplayer', function() {
 		const id = server._getNewId()
-		const activePlayers = Object.keys(io.sockets.sockets).length
+		socket.car = server._getCar()
+		socket.playerId = id
+		
 		const player = {
 			_id:    id,
 			x: 	   randomInt(100, 400),
 			y: 	   randomInt(100, 400),
 			angle: randomInt(0, 360),
-			type: types.player
-		}
-
-		socket.playerId = id
-		if (activePlayers <= 1) {
-			player.car = 'car_yellow'
-			player.ball = 'yellow_ball'
-		} else {
-			player.car = 'car_blue'
-			player.ball = 'blue_ball'
+			type: types.player,
+			car: socket.car
 		}
 
 		server._addEntity(player)
@@ -220,6 +233,7 @@ io.on('connection', function(socket) {
 		socket.on('disconnect', function() {
 			io.emit('remove', socket.playerId)
 			server._removePlayer(socket.playerId)
+			server._returnCar(socket.car)
 		})
 		
 		socket.on('move', function(data) {

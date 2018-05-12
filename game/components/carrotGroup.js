@@ -1,21 +1,21 @@
 class CarrotGroup {
 	constructor() {
 		this.sprite = 'ammo'
-		// this.audio = {
-		// 	pickup: 'pickup',
-		// 	spawn: 'spawn'
-		// }
-		// this.sound = {
-		// 	pickup: Game.addAudio(this.audio.pickup),
-		// 	spawn:  Game.addAudio(this.audio.spawn)
-		// }
+		this.audio = {
+			pickup: 'pickup',
+			spawn: 'spawn'
+		}
+		this.sound = {
+			pickup: PhaserGame.add.audio(this.audio.pickup),
+			spawn:  PhaserGame.add.audio(this.audio.spawn)
+		}
 		this.carrots = PhaserGame.add.physicsGroup()
 	}
 
 	add(entity) {
 		const carrot = this.carrots.create(entity.x, entity.y, this.sprite)
 		carrot._id = entity._id
-		//this.playSound(this.audio.spawn)
+		this.playSound(this.audio.spawn)
 	}
 
 	playSound(sound) {
@@ -34,6 +34,7 @@ class CarrotGroup {
 			const carrot = this.carrots.children[index];
 			if (carrot._id === id) {
 				carrot.kill()
+				this.playSound(this.audio.pickup)
 				break
 			}
 		}

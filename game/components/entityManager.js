@@ -137,22 +137,6 @@ class MyEntityManager {
 		}
 	}
 
-	cleanEntityId(entity) {
-		const ent = this.getEntity(entity.tempId)
-		ent._id = entity._id
-		ent.sprite._id = entity._id
-	}
-
-	updateEntity(entity) {
-		entity.update()
-	}
-
-	updateEntities() {
-		this.entities.forEach((entity) => {
-			this.updateEntity(entity)
-		})
-	}
-
 	updateWorldState(entities) {
 		if (!entities) {
 			return
@@ -162,7 +146,7 @@ class MyEntityManager {
 			const state = entities[i]
 			
 			// This entity does not exist
-			if (!this.getEntity(state._id)) {
+			if (!this.getEntity(state._id) || state.type === Utils.types.carrot) {
 				return
 			}
 
@@ -178,7 +162,7 @@ class MyEntityManager {
 		   	const entity = this.entities[i]
 	   
 			// No point in interpolating this client's entity.
-			if (entity._id === this.client._id) {
+			if (entity._id === this.client._id || entity.type === Utils.types.carrot) {
 				continue
 			}
 			entity.update()

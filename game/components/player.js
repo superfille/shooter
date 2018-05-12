@@ -10,10 +10,12 @@ class Player extends Entity {
 
 		this.name = data.name
 		this.type = data.type
-		this.sprite = PhaserGame.add.sprite(data.x, data.y, data.car)
+		this.sprite = PhaserGame.add.sprite(data.x, data.y, "car_" + data.car)
 		this.sprite._id = data._id
 		this.sprite.anchor.set(0.5)
 		this.sprite.angle = data.angle
+
+		this.dieSound = PhaserGame.add.audio('explosion')
 		
 		this.isImmun = false
 
@@ -22,7 +24,7 @@ class Player extends Entity {
 
 		this.hearts = Heart.initialize(3, this.hudX, this.hudY)
 		this.coins = new Coin(0, this.hudX, this.hudY)
-		this.weapon = new Weapon(this.sprite, data.ball)
+		this.weapon = new Weapon(this.sprite, "ball_" + data.car)
 
 		this.initExplosionParticles()
 	}
@@ -119,17 +121,11 @@ class Player extends Entity {
 	}
 
 	die () {
-		if (this.dieSound) {
-			this.dieSound.play()
-		}
+		this.dieSound.play()
 		this.sprite.kill()
 		this.weapon.destroy()
 		Client.iDied()
 	//	this.dieEffect()
-	}
-
-	addDieSound (sound) {
-		this.dieSound = PhaserGame.add.audio(sound)
 	}
 
 	isAlive () {
